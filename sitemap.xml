@@ -67,14 +67,28 @@
 
   
   <url>
-    <loc>https://peipeihai.github.io/tags/javascript/</loc>
+    <loc>https://peipeihai.github.io/tags/%E8%AF%97%E8%AF%8D/</loc>
     <lastmod>2021-06-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>https://peipeihai.github.io/tags/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/</loc>
+    <loc>https://peipeihai.github.io/tags/%E6%98%A5%E5%A4%A9/</loc>
+    <lastmod>2021-06-28</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://peipeihai.github.io/tags/%E6%9F%B3%E5%AE%97%E5%85%83/</loc>
+    <lastmod>2021-06-28</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://peipeihai.github.io/tags/javascript/</loc>
     <lastmod>2021-06-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -109,6 +123,13 @@
   </url>
   
   <url>
+    <loc>https://peipeihai.github.io/tags/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/</loc>
+    <lastmod>2021-06-28</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://peipeihai.github.io/tags/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/</loc>
     <lastmod>2021-06-28</lastmod>
     <changefreq>daily</changefreq>
@@ -122,38 +143,17 @@
     <priority>0.6</priority>
   </url>
   
-  <url>
-    <loc>https://peipeihai.github.io/tags/%E8%AF%97%E8%AF%8D/</loc>
-    <lastmod>2021-06-28</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://peipeihai.github.io/tags/%E6%9F%B3%E5%AE%97%E5%85%83/</loc>
-    <lastmod>2021-06-28</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://peipeihai.github.io/tags/%E6%98%A5%E5%A4%A9/</loc>
-    <lastmod>2021-06-28</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
 
   
   <url>
-    <loc>https://peipeihai.github.io/categories/web%E5%89%8D%E7%AB%AF/</loc>
+    <loc>https://peipeihai.github.io/categories/%E8%AF%97%E8%AF%8D/</loc>
     <lastmod>2021-06-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>https://peipeihai.github.io/categories/%E8%AF%97%E8%AF%8D/</loc>
+    <loc>https://peipeihai.github.io/categories/web%E5%89%8D%E7%AB%AF/</loc>
     <lastmod>2021-06-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
