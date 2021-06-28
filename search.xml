@@ -228,7 +228,7 @@ console.log(people); // [ Person &#123; name: &#39;john&#39; &#125;, Person &#12
 <p>代理的应用场景是不可限量的。开发者使用它可以创建出各种编码模式，比如（但远远不限于）跟踪属性访问、隐藏属性、阻止修改或删除属性、函数参数验证、构造函数参数验证、数据绑定，以及可观察对象。</p>
 ]]></content>
       <categories>
-        <category>工作</category>
+        <category>web前端</category>
       </categories>
       <tags>
         <tag>javascript</tag>
@@ -240,7 +240,7 @@ console.log(people); // [ Person &#123; name: &#39;john&#39; &#125;, Person &#12
   </entry>
   <entry>
     <title>javascript中的垃圾回收</title>
-    <url>/2021/06/28/javascript/javascript%E4%B8%AD%E7%9A%84%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/</url>
+    <url>/2021/06/25/javascript/javascript%E4%B8%AD%E7%9A%84%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/</url>
     <content><![CDATA[<p>在浏览器的发展史上，用到过两种主要的标记策略：标记清理和引用计数。</p>
 <!-- 这是注释：下面的标签表示文章只显示之前的内容作为摘要 -->
 <span id="more"></span>
@@ -276,11 +276,178 @@ setInterval(() =&gt; &#123;￼ console.log(name);￼ &#125;, 100);
 <p>调用 outer()会导致分配给 name 的内存被泄漏。以上代码执行后创建了一个内部闭包，只要返回的函数存在就不能清理 name，因为闭包一直在引用着它。假如 name 的内容很大（不止是一个小字符串），那可能就是个大问题了。</p>
 ]]></content>
       <categories>
-        <category>工作</category>
+        <category>web前端</category>
       </categories>
       <tags>
         <tag>javascript</tag>
         <tag>垃圾回收</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>javascript面向对象</title>
+    <url>/2021/06/27/javascript/javascript%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/</url>
+    <content><![CDATA[<p>本文介绍了 javascript 中创建对象的方法以及实现继承的方法。</p>
+<!-- 这是注释：下面的标签表示文章只显示之前的内容作为摘要 -->
+<span id="more"></span>
+
+<h1 id="对象创建"><a href="#对象创建" class="headerlink" title="对象创建"></a>对象创建</h1><p>在 ES6 中类的概念出现之前，主要有以下创建对象的方法。注，ES6 的类都仅仅是封装了 ES5.1 构造函数加原型继承的语法糖而已。</p>
+<h2 id="工厂模式"><a href="#工厂模式" class="headerlink" title="工厂模式"></a>工厂模式</h2><p>工厂模式是一种众所周知的设计模式，广泛应用于软件工程领域，用于抽象创建特定对象的过程。</p>
+<pre><code>function createPerson(name, age, job) &#123;
+  let o = new Object();
+  o.name = name;
+  o.age = age;
+  o.job = job;
+  o.sayName = function () &#123;
+    console.log(this.name);
+  &#125;;
+  return o;
+&#125;
+let person1 = createPerson(&#39;Nicholas&#39;, 29, &#39;Software Engineer&#39;);
+let person2 = createPerson(&#39;Greg&#39;, 27, &#39;Doctor&#39;);
+</code></pre>
+<h2 id="构造函数模式"><a href="#构造函数模式" class="headerlink" title="构造函数模式"></a>构造函数模式</h2><pre><code>function Person(name, age, job) &#123;
+  this.name = name;
+  this.age = age;
+  this.job = job;
+  this.sayName = function () &#123;
+    console.log(this.name);
+  &#125;;
+&#125;
+let person1 = new Person(&#39;Nicholas&#39;, 29, &#39;Software Engineer&#39;);
+let person2 = new Person(&#39;Greg&#39;, 27, &#39;Doctor&#39;);
+person1.sayName(); // Nicholas￼
+person2.sayName(); // Greg
+</code></pre>
+<p>执行 new 操作符时，引擎内部会执行如下操作：</p>
+<ul>
+<li>在内存中创建一个新对象。</li>
+<li>这个新对象内部的[[Prototype]]特性被赋值为构造函数的 prototype 属性。</li>
+<li>构造函数内部的 this 被赋值为这个新对象（即 this 指向新对象）。</li>
+<li>执行构造函数内部的代码（给新对象添加属性）。</li>
+<li>如果构造函数返回非空对象，则返回该对象；否则，返回刚创建的新对象。</li>
+</ul>
+<p>构造函数的主要问题在于，其定义的方法会在每个实例上都创建一遍。因此对前面的例子而言，person1 和 person2 都有名为 sayName()的方法，但这两个方法不是同一个 Function 实例。</p>
+<h2 id="原型模式"><a href="#原型模式" class="headerlink" title="原型模式"></a>原型模式</h2><p>每个函数都会创建一个 prototype 属性，这个属性是一个对象，包含应该由特定引用类型的实例共享的属性和方法。实际上，这个对象就是通过调用构造函数创建的对象的原型。使用原型对象的好处是，在它上面定义的属性和方法可以被对象实例共享。原来在构造函数中直接赋给对象实例的值，可以直接赋值给它们的原型。</p>
+<h1 id="继承"><a href="#继承" class="headerlink" title="继承"></a>继承</h1><h2 id="原型链"><a href="#原型链" class="headerlink" title="原型链"></a>原型链</h2><p>ECMA-262 把原型链定义为 ECMAScript 的主要继承方式。其基本思想就是通过原型继承多个引用类型的属性和方法。</p>
+<p>重温一下构造函数、原型和实例的关系：每个构造函数都有一个原型对象，原型有一个属性指回构造函数，而实例有一个内部指针指向原型。如果原型是另一个类型的实例呢？那就意味着这个原型本身有一个内部指针指向另一个原型，相应地另一个原型也有一个指针指向另一个构造函数。这样就在实例和原型之间构造了一条原型链。</p>
+<p>原型链虽然是实现继承的强大工具，但它也有问题。主要问题出现在原型中包含引用值的时候。前面在谈到原型的问题时也提到过，原型中包含的引用值会在所有实例间共享，这也是为什么属性通常会在构造函数中定义而不会定义在原型上的原因。</p>
+<p>原型链的第二个问题是，子类型在实例化时不能给父类型的构造函数传参。事实上，我们无法在不影响所有对象实例的情况下把参数传进父类的构造函数。再加上之前提到的原型中包含引用值的问题，就导致原型链基本不会被单独使用。</p>
+<h2 id="借用构造函数"><a href="#借用构造函数" class="headerlink" title="借用构造函数"></a>借用构造函数</h2><p>为了解决原型包含引用值导致的继承问题，一种叫作“盗用构造函数”（constructor stealing）的技术在开发社区流行起来（这种技术有时也称作“对象伪装”或“经典继承”）。基本思路很简单：在子类构造函数中调用父类构造函数。因为毕竟函数就是在特定上下文中执行代码的简单对象，所以可以使用 apply()和 call()方法以新创建的对象为上下文执行构造函数。</p>
+<ol>
+<li>传递参数</li>
+</ol>
+<p>相比于使用原型链，盗用构造函数的一个优点就是可以在子类构造函数中向父类构造函数传参。</p>
+<pre><code>function SuperType(name) &#123;
+  this.name = name;
+&#125;
+
+function SubType() &#123;
+  // 继承SuperType并传参￼
+  SuperType.call(this, &#39;Nicholas&#39;);
+  // 实例属性￼
+  this.age = 29;
+&#125;
+
+let instance = new SubType();
+console.log(instance.name); // &quot;Nicholas&quot;;
+console.log(instance.age); // 29
+</code></pre>
+<ol start="2">
+<li>盗用构造函数的问题</li>
+</ol>
+<p>盗用构造函数的主要缺点，也是使用构造函数模式自定义类型的问题：必须在构造函数中定义方法，因此函数不能重用。此外，子类也不能访问父类原型上定义的方法，因此所有类型只能使用构造函数模式。由于存在这些问题，盗用构造函数基本上也不能单独使用。</p>
+<h2 id="组合继承"><a href="#组合继承" class="headerlink" title="组合继承"></a>组合继承</h2><p>组合继承（有时候也叫伪经典继承）综合了原型链和盗用构造函数，将两者的优点集中了起来。基本的思路是使用原型链继承原型上的属性和方法，而通过盗用构造函数继承实例属性。这样既可以把方法定义在原型上以实现重用，又可以让每个实例都有自己的属性。</p>
+<p>组合继承弥补了原型链和盗用构造函数的不足，是 JavaScript 中使用最多的继承模式。而且组合继承也保留了 instanceof 操作符和 isPrototypeOf()方法识别合成对象的能力。</p>
+<pre><code>function SuperType(name) &#123;
+  this.name = name;
+  this.colors = [&#39;red&#39;, &#39;blue&#39;, &#39;green&#39;];
+&#125;
+SuperType.prototype.sayName = function () &#123;
+  console.log(this.name);
+&#125;;
+function SubType(name, age) &#123;
+  SuperType.call(this, name); //第二次调用SuperType()
+  this.age = age;
+&#125;
+SubType.prototype = new SuperType(); //第一次调用SuperType()
+SubType.prototype.constructor = SubType;
+SubType.prototype.sayAge = function () &#123;
+  console.log(this.age);
+&#125;;
+</code></pre>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>JavaScript 的继承主要通过原型链来实现。原型链涉及把构造函数的原型赋值为另一个类型的实例。这样一来，子类就可以访问父类的所有属性和方法，就像基于类的继承那样。原型链的问题是所有继承的属性和方法都会在对象实例间共享，无法做到实例私有。</p>
+<p>盗用构造函数模式通过在子类构造函数中调用父类构造函数，可以避免这个问题。这样可以让每个实例继承的属性都是私有的，但要求类型只能通过构造函数模式来定义（因为子类不能访问父类原型上的方法）。</p>
+<p>目前最流行的继承模式是组合继承，即通过原型链继承共享的属性和方法，通过盗用构造函数继承实例属性。</p>
+<h2 id="其他继承方式"><a href="#其他继承方式" class="headerlink" title="其他继承方式"></a>其他继承方式</h2><p>除上述模式之外，还有以下几种继承模式。<br>❑ 原型式继承可以无须明确定义构造函数而实现继承，本质上是对给定对象执行浅复制。这种操作的结果之后还可以再进一步增强。<br>❑ 与原型式继承紧密相关的是寄生式继承，即先基于一个对象创建一个新对象，然后再增强这个新对象，最后返回新对象。这个模式也被用在组合继承中，用于避免重复调用父类构造函数导致的浪费。<br>❑ 寄生组合继承被认为是实现基于类型继承的最有效方式。</p>
+<h3 id="原型式继承"><a href="#原型式继承" class="headerlink" title="原型式继承"></a>原型式继承</h3><p>2006 年，Douglas Crockford 写了一篇文章：《JavaScript 中的原型式继承》（“Prototypal Inheritance in JavaScript”）。这篇文章介绍了一种不涉及严格意义上构造函数的继承方法。他的出发点是即使不自定义类型也可以通过原型实现对象之间的信息共享。文章最终给出了一个函数：</p>
+<pre><code>function object(o) &#123;
+  function F() &#123;&#125;
+  F.prototype = o;
+  return new F();
+&#125;
+</code></pre>
+<p>Crockford 推荐的原型式继承适用于这种情况：你有一个对象，想在它的基础上再创建一个新对象。你需要把这个对象先传给 object()，然后再对返回的对象进行适当修改。</p>
+<p>ECMAScript 5 通过增加 Object.create()方法将原型式继承的概念规范化了。这个方法接收两个参数：作为新对象原型的对象，以及给新对象定义额外属性的对象（第二个可选）。</p>
+<h3 id="寄生式继承"><a href="#寄生式继承" class="headerlink" title="寄生式继承"></a>寄生式继承</h3><p>与原型式继承比较接近的一种继承方式是寄生式继承（parasitic inheritance），也是 Crockford 首倡的一种模式。寄生式继承背后的思路类似于寄生构造函数和工厂模式：创建一个实现继承的函数，以某种方式增强对象，然后返回这个对象。</p>
+<pre><code>function createAnother(original) &#123;
+  let clone = object(original); // 通过调用函数创建一个新对象
+  clone.sayHi = function () &#123;
+    // 以某种方式增强这个对象￼
+    console.log(&#39;hi&#39;);
+  &#125;;
+  return clone; // 返回这个对象
+&#125;
+</code></pre>
+<p>寄生式继承同样适合主要关注对象，而不在乎类型和构造函数的场景。object()函数不是寄生式继承所必需的，任何返回新对象的函数都可以在这里使用。注意: 通过寄生式继承给对象添加函数会导致函数难以重用，与构造函数模式类似。</p>
+<h3 id="寄生式组合继承"><a href="#寄生式组合继承" class="headerlink" title="寄生式组合继承"></a>寄生式组合继承</h3><p>组合继承其实也存在效率问题。最主要的效率问题就是父类构造函数始终会被调用两次：一次在是创建子类原型时调用，另一次是在子类构造函数中调用。本质上，子类原型最终是要包含超类对象的所有实例属性，子类构造函数只要在执行时重写自己的原型就行了。</p>
+<h1 id="ES6-Class"><a href="#ES6-Class" class="headerlink" title="ES6 Class"></a>ES6 Class</h1><p>抽象基类<br>有时候可能需要定义这样一个类，它可供其他类继承，但本身不会被实例化。虽然 ECMAScript 没有专门支持这种类的语法，但通过 new.target 也很容易实现。</p>
+<p>new.target 保存通过 new 关键字调用的类或函数。通过在实例化时检测 new.target 是不是抽象基类，可以阻止对抽象基类的实例化：</p>
+<pre><code>// 使用 new.target 实现 ES6 抽象基类
+class Vehicle &#123;
+  constructor() &#123;
+    console.log(new.target);
+    if (new.target === Vehicle) &#123;
+      throw new Error(&#39;Vehicle cannot be directly instantiated&#39;);
+    &#125;
+  &#125;
+&#125;
+
+new Vehicle(); // Error: Vehicle cannot be directly instantiated
+</code></pre>
+<p>另外，通过在抽象基类构造函数中进行检查，可以要求派生类必须定义某个方法。因为原型方法在调用类构造函数之前就已经存在了，所以可以通过 this 关键字来检查相应的方法：</p>
+<pre><code>// 抽象基类
+class Vehicle &#123;
+  constructor() &#123;
+    if (new.target === Vehicle) &#123;
+      throw new Error(&#39;Vehicle cannot be directly instantiated&#39;);
+    &#125;
+
+    if (!this.foo) &#123;
+      throw new Error(&#39;Inheriting class must define foo()&#39;);
+    &#125;
+    console.log(&#39;success! &#39;);
+  &#125;
+&#125;
+
+// 派生类
+class Bus extends Vehicle &#123;
+  foo() &#123;&#125;
+&#125;
+
+// 派生类
+class Van extends Vehicle &#123;&#125;
+
+new Bus(); // success!
+new Van(); // Error: Inheriting class must define foo()
+</code></pre>
+]]></content>
+      <categories>
+        <category>web前端</category>
+      </categories>
+      <tags>
+        <tag>javascript</tag>
+        <tag>面向对象</tag>
+        <tag>原型继承</tag>
       </tags>
   </entry>
   <entry>
