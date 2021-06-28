@@ -5,6 +5,9 @@
     <url>/2021/06/28/javascript%E4%B8%AD%E7%9A%84%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/</url>
     <content><![CDATA[<pre><code>在浏览器的发展史上，用到过两种主要的标记策略：标记清理和引用计数。
 </code></pre>
+<!-- 这是注释：下面的标签表示文章只显示之前的内容作为摘要 -->
+<span id="more"></span>
+
 <h2 id="标记清理"><a href="#标记清理" class="headerlink" title="标记清理"></a>标记清理</h2><p>JavaScript 最常用的垃圾回收策略是标记清理（mark-and-sweep）。当变量进入上下文，比如在函数内部声明一个变量时，这个变量会被加上存在于上下文中的标记。而在上下文中的变量，逻辑上讲，永远不应该释放它们的内存，因为只要上下文中的代码在运行，就有可能用到它们。当变量离开上下文时，也会被加上离开上下文的标记。</p>
 <p>给变量加标记的方式有很多种。比如，当变量进入上下文时，反转某一位；或者可以维护“在上下文中”和“不在上下文中”两个变量列表，可以把变量从一个列表转移到另一个列表。标记过程的实现并不重要，关键是策略。<br>垃圾回收程序运行的时候，会标记内存中存储的所有变量（记住，标记方法有很多种）。然后，它会将所有在上下文中的变量，以及被在上下文中的变量引用的变量的标记去掉。在此之后再被加上标记的变量就是待删除的了，原因是任何在上下文中的变量都访问不到它们了。随后垃圾回收程序做一次内存清理，销毁带标记的所有值并收回它们的内存。</p>
 <p>到了 2008 年，IE、Firefox、Opera、Chrome 和 Safari 都在自己的 JavaScript 实现中采用标记清理（或其变体），只是在运行垃圾回收的频率上有所差异。</p>
@@ -40,18 +43,6 @@ setInterval(() =&gt; &#123;￼ console.log(name);￼ &#125;, 100);
       </categories>
       <tags>
         <tag>javascript</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>使用github pages和Hexo搭建自己的博客</title>
-    <url>/2021/06/24/%E4%BD%BF%E7%94%A8github%20pages%E5%92%8CHexo%E6%90%AD%E5%BB%BA%E8%87%AA%E5%B7%B1%E7%9A%84%E5%8D%9A%E5%AE%A2/</url>
-    <content><![CDATA[]]></content>
-      <categories>
-        <category>工作</category>
-      </categories>
-      <tags>
-        <tag>参数化</tag>
-        <tag>性能测试</tag>
       </tags>
   </entry>
 </search>
