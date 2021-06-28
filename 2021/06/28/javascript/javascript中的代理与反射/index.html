@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+<meta name="google-site-verification" content="PMsD39EGVksOtM5ZQp2bioN81CozCXsClQnjVFVnxyk" />
+<meta name="baidu-site-verification" content="code-z6M1yoz4m9" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-center-circle.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"peipeihai.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="ECMAScript6 新增的代理和反射为开发者提供了拦截并向基本操作嵌入额外行为的能力。具体地说，可以给目标对象定义一个关联的代理对象，而这个代理对象可以作为抽象的目标对象来使用。在对目标对象的各种操作影响目标对象之前，可以在代理对象中对这些操作加以控制。在任何可以使用目标对象的地方，都可以通过同样的方式来使用与之关联的代理对象。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="javascript中的代理与反射">
+<meta property="og:url" content="https://peipeihai.github.io/2021/06/28/javascript/javascript%E4%B8%AD%E7%9A%84%E4%BB%A3%E7%90%86%E4%B8%8E%E5%8F%8D%E5%B0%84/index.html">
+<meta property="og:site_name" content="皮皮蟹">
+<meta property="og:description" content="ECMAScript6 新增的代理和反射为开发者提供了拦截并向基本操作嵌入额外行为的能力。具体地说，可以给目标对象定义一个关联的代理对象，而这个代理对象可以作为抽象的目标对象来使用。在对目标对象的各种操作影响目标对象之前，可以在代理对象中对这些操作加以控制。在任何可以使用目标对象的地方，都可以通过同样的方式来使用与之关联的代理对象。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-06-28T10:53:42.000Z">
+<meta property="article:modified_time" content="2021-06-28T11:52:38.162Z">
+<meta property="article:author" content="barretyi">
+<meta property="article:tag" content="javascript">
+<meta property="article:tag" content="代理">
+<meta property="article:tag" content="Proxy">
+<meta property="article:tag" content="反射">
+<meta property="article:tag" content="Reflect">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://peipeihai.github.io/2021/06/28/javascript/javascript%E4%B8%AD%E7%9A%84%E4%BB%A3%E7%90%86%E4%B8%8E%E5%8F%8D%E5%B0%84/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>javascript中的代理与反射 | 皮皮蟹</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">皮皮蟹</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">劝君莫惜金缕衣，劝君惜取少年时</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-首页">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-关于">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-标签">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-分类">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-归档">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://peipeihai.github.io/2021/06/28/javascript/javascript%E4%B8%AD%E7%9A%84%E4%BB%A3%E7%90%86%E4%B8%8E%E5%8F%8D%E5%B0%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/7858692?v=4">
+      <meta itemprop="name" content="barretyi">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="皮皮蟹">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          javascript中的代理与反射
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-06-28 18:53:42 / 修改时间：19:52:38" itemprop="dateCreated datePublished" datetime="2021-06-28T18:53:42+08:00">2021-06-28</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C/" itemprop="url" rel="index"><span itemprop="name">工作</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>ECMAScript6 新增的代理和反射为开发者提供了拦截并向基本操作嵌入额外行为的能力。具体地说，可以给目标对象定义一个关联的代理对象，而这个代理对象可以作为抽象的目标对象来使用。在对目标对象的各种操作影响目标对象之前，可以在代理对象中对这些操作加以控制。在任何可以使用目标对象的地方，都可以通过同样的方式来使用与之关联的代理对象。</p>
+<!-- 这是注释：下面的标签表示文章只显示之前的内容作为摘要 -->
+<span id="more"></span>
+
+<h1 id="代理与反射"><a href="#代理与反射" class="headerlink" title="代理与反射"></a>代理与反射</h1><h2 id="创建代理"><a href="#创建代理" class="headerlink" title="创建代理"></a>创建代理</h2><p>代理是使用 Proxy 构造函数创建的。这个构造函数接收两个参数：目标对象和处理程序对象。要创建空代理，可以传一个简单的对象字面量作为处理程序对象，从而让所有操作畅通无阻地抵达目标对象。</p>
+<pre><code>const target = &#123; id: &#39;target&#39; &#125;;
+const handler = &#123;&#125;;
+
+const proxy = new Proxy(target, handler);
+
+console.log(target.id); // target
+console.log(proxy.id); // target
+
+// 给目标赋值也会反映到代理上，两者引用的是同一个对象
+target.id = &#39;foo&#39;;
+console.log(target.id); // foo
+console.log(proxy.id); // foo
+
+// 给代理赋值同样也会反映到目标上
+proxy.id = &#39;bar&#39;;
+console.log(target.id); // bar
+console.log(proxy.id); // bar
+
+console.log(target.hasOwnProperty(&#39;id&#39;)); // true
+console.log(proxy.hasOwnProperty(&#39;id&#39;)); // true
+</code></pre>
+<h2 id="定义捕获器"><a href="#定义捕获器" class="headerlink" title="定义捕获器"></a>定义捕获器</h2><p>使用代理的主要目的是可以定义捕获器（trap）。捕获器就是在处理程序对象中定义的“基本操作的拦截器”。每个处理程序对象可以包含零个或多个捕获器，每个捕获器都对应一种基本操作，可以直接或间接在代理对象上调用。每次在代理对象上调用这些基本操作时，代理可以在这些操作传播到目标对象之前先调用捕获器函数，从而拦截并修改相应的行为。</p>
+<pre><code>注： 捕获器（trap）是从操作系统中借用的概念。在操作系统中，捕获器是程序流中的一个同步中断，可以暂停程序流，转而执行一段子例程，之后再返回原始程序流。
+</code></pre>
+<pre><code>const target = &#123; foo: &#39;bar&#39; &#125;;
+const handler = &#123;
+  get() &#123;
+    return &#39;handler override&#39;;
+  &#125;,
+&#125;;
+const proxy = new Proxy(target, handler);
+
+// 注意，只有在代理对象上执行这些操作才会触发捕获器。在目标对象上执行这些操作仍然会产生正常的行为。
+console.log(proxy.foo); // handler override
+console.log(target.foo); // bar
+</code></pre>
+<h2 id="捕获器参数和反射-API"><a href="#捕获器参数和反射-API" class="headerlink" title="捕获器参数和反射 API"></a>捕获器参数和反射 API</h2><p>所有捕获器都可以访问相应的参数，基于这些参数可以重建被捕获方法的原始行为。比如，get()捕获器会接收到目标对象、要查询的属性和代理对象三个参数。</p>
+<pre><code>const target = &#123; foo: &#39;bar&#39; &#125;;
+const handler = &#123;
+  get(trapTarget, property, receiver) &#123;
+    console.log(target === trapTarget);
+    console.log(property);
+    console.log(receiver === proxy);
+
+    // 有了这些参数，就可以重建被捕获方法的原始行为
+    return trapTarget[property];
+  &#125;,
+&#125;;
+const proxy = new Proxy(target, handler);
+console.log(proxy.foo);
+// true
+// foo
+// true
+// bar
+</code></pre>
+<p>所有捕获器都可以基于自己的参数重建原始操作，但并非所有捕获器行为都像 get()那么简单。因此，通过手动写码如法炮制的想法是不现实的。实际上，开发者并不需要手动重建原始行为，而是可以通过调用全局 Reflect 对象上（封装了原始行为）的同名方法来轻松重建。处理程序对象中所有可以捕获的方法都有对应的反射（Reflect）API 方法。这些方法与捕获器拦截的方法具有相同的名称和函数签名，而且也具有与被拦截方法相同的行为。</p>
+<pre><code>const target = &#123; foo: &#39;bar&#39; &#125;;
+const handler = &#123;
+  get() &#123;
+    return Reflect.get(...arguments);
+  &#125;,
+  // 甚至可以使用更简洁的写法
+  // get: Reflect.get,
+&#125;;
+const proxy = new Proxy(target, handler);
+console.log(proxy.foo);
+</code></pre>
+<p>使用代理对原对象的访问进行修饰：</p>
+<pre><code>const target = &#123; foo: &#39;bar&#39; &#125;;
+const handler = &#123;
+  get(trapTarget, property, receiver) &#123;
+    let propertyDecoration = &#39;&#39;;
+    if (property === &#39;foo&#39;) &#123;
+      propertyDecoration = &#39;!!!&#39;;
+    &#125;
+    return Reflect.get(target, property, receiver) + propertyDecoration;
+  &#125;,
+&#125;;
+const proxy = new Proxy(target, handler);
+console.log(proxy.foo); // bar!!!
+</code></pre>
+<h2 id="可撤销代理"><a href="#可撤销代理" class="headerlink" title="可撤销代理"></a>可撤销代理</h2><p>有时候可能需要中断代理对象与目标对象之间的联系。对于使用 new Proxy()创建的普通代理来说，这种联系会在代理对象的生命周期内一直持续存在。Proxy 也暴露了 revocable()方法，这个方法支持撤销代理对象与目标对象的关联。撤销代理的操作是不可逆的。而且，撤销函数（revoke()）是幂等的，调用多少次的结果都一样。撤销代理之后再调用代理会抛出 TypeError。</p>
+<pre><code>const target = &#123; foo: &#39;bar&#39; &#125;;
+const handler = &#123;
+  get(trapTarget, property, receiver) &#123;
+    let propertyDecoration = &#39;&#39;;
+    if (property === &#39;foo&#39;) &#123;
+      propertyDecoration = &#39;!!!&#39;;
+    &#125;
+    return Reflect.get(target, property, receiver) + propertyDecoration;
+  &#125;,
+&#125;;
+const &#123; proxy, revoke &#125; = Proxy.revocable(target, handler);
+console.log(proxy.foo); // bar!!!
+
+// 撤销代理
+revoke();
+console.log(proxy.foo); // TypeError: Cannot perform &#39;get&#39; on a proxy that has been revoked
+</code></pre>
+<h2 id="多层代理"><a href="#多层代理" class="headerlink" title="多层代理"></a>多层代理</h2><p>代理可以拦截反射 API 的操作，而这意味着完全可以创建一个代理，通过它去代理另一个代理。这样就可以在一个目标对象之上构建多层拦截网。</p>
+<pre><code>const target = &#123; foo: &#39;bar&#39; &#125;;
+const firstProxy = new Proxy(target, &#123;
+  get() &#123;
+    console.log(&#39;first proxy&#39;);
+    return Reflect.get(...arguments);
+  &#125;,
+&#125;);
+const secondProxy = new Proxy(firstProxy, &#123;
+  get() &#123;
+    console.log(&#39;second proxy&#39;);
+    return Reflect.get(...arguments);
+  &#125;,
+&#125;);
+console.log(secondProxy.foo);
+// second proxy
+// first proxy
+// bar
+</code></pre>
+<h2 id="代理捕获器与反射方法"><a href="#代理捕获器与反射方法" class="headerlink" title="代理捕获器与反射方法"></a>代理捕获器与反射方法</h2><p>代理可以捕获 13 种不同的基本操作。这些操作有各自不同的反射 API 方法、参数、关联 ECMAScript 操作和不变式。</p>
+<ul>
+<li>get()</li>
+<li>set()</li>
+<li>has()</li>
+<li>defineProperty()</li>
+<li>getOwnPropertyDescriptor()</li>
+<li>deleteProperty()</li>
+<li>ownKeys()</li>
+<li>getPrototypeOf()</li>
+<li>setPrototypeOf()</li>
+<li>isExtensible()</li>
+<li>preventExtensions()</li>
+<li>apply()</li>
+<li>construct()</li>
+</ul>
+<h1 id="代理模式"><a href="#代理模式" class="headerlink" title="代理模式"></a>代理模式</h1><p>使用代理可以在代码中实现一些有用的编程模式。</p>
+<h2 id="1-跟踪属性访问"><a href="#1-跟踪属性访问" class="headerlink" title="1. 跟踪属性访问"></a>1. 跟踪属性访问</h2><p>通过捕获 get、set 和 has 等操作，可以知道对象属性什么时候被访问、被查询。把实现相应捕获器的某个对象代理放到应用中，可以监控这个对象何时在何处被访问过。</p>
+<pre><code>const target = &#123; foo: &#39;bar&#39; &#125;;
+const proxy = new Proxy(target, &#123;
+  get(target, propertyKey, receiver) &#123;
+    console.log(`getting property: $&#123;propertyKey&#125;`);
+    return Reflect.get(...arguments);
+  &#125;,
+  set(target, propertyKey, value, receiver) &#123;
+    console.log(`setting property: $&#123;propertyKey&#125;, with value: $&#123;value&#125;`);
+    return Reflect.set(...arguments);
+  &#125;,
+&#125;);
+proxy.foo; // getting property: foo
+proxy.foo = &#39;hello&#39;; // setting property: foo, with value: hello
+</code></pre>
+<h2 id="2-隐藏属性"><a href="#2-隐藏属性" class="headerlink" title="2. 隐藏属性"></a>2. 隐藏属性</h2><p>实现很简单，如果不想对外提供某个属性的访问，只需要在 get 捕获器返回 undefined 即可。</p>
+<h2 id="3-属性验证"><a href="#3-属性验证" class="headerlink" title="3. 属性验证"></a>3. 属性验证</h2><p>所有赋值操作都会触发 set() 捕获器，所以可以根据所赋的值决定是允许还是拒绝赋值。</p>
+<h2 id="4-函数与构造函数参数验证"><a href="#4-函数与构造函数参数验证" class="headerlink" title="4. 函数与构造函数参数验证"></a>4. 函数与构造函数参数验证</h2><p>跟保护和验证对象属性类似，也可对函数和构造函数参数进行审查。</p>
+<p>使用 apply 捕获器代理函数，执行参数检查：</p>
+<pre><code>function sum(...nums) &#123;
+  return nums.reduce((a, b) =&gt; a + b, 0);
+&#125;
+
+const sumProxy = new Proxy(sum, &#123;
+  apply(target, thisArg, argumentsList) &#123;
+    for (let item of argumentsList) &#123;
+      if (typeof item !== &#39;number&#39;) &#123;
+        throw new Error(&#39;arguments must be numbers&#39;);
+      &#125;
+    &#125;
+    return Reflect.apply(...arguments);
+  &#125;,
+&#125;);
+
+console.log(sumProxy(1, 2, 3, 4)); // 10
+console.log(sumProxy(1, 2, 3, 4, &#39;hello&#39;)); // Error: arguments must be numbers
+</code></pre>
+<p>使用 contruct 捕获器代理类，检查构造器参数：</p>
+<pre><code>class Person &#123;
+  constructor(name) &#123;
+    this.name = name;
+  &#125;
+&#125;
+
+const PersonProxy = new Proxy(Person, &#123;
+  construct(target, argumentsList, newTarget) &#123;
+    if (argumentsList[0] === undefined) &#123;
+      throw new Error(&#39;Person cannot be inited with `name` arg&#39;);
+    &#125; else &#123;
+      return Reflect.construct(...arguments);
+    &#125;
+  &#125;,
+&#125;);
+
+new PersonProxy(&#39;john&#39;); // ok
+new PersonProxy(); // Error: Person cannot be inited with `name` arg
+</code></pre>
+<h2 id="5-数据绑定与可观察对象"><a href="#5-数据绑定与可观察对象" class="headerlink" title="5. 数据绑定与可观察对象"></a>5. 数据绑定与可观察对象</h2><p>通过代理可以把运行时中原本不相关的部分联系到一起。这样就可以实现各种模式，从而让不同的代码互操作。比如，可以将被代理的类绑定到一个全局实例集合，让所有创建的实例都被添加到这个集合中。</p>
+<pre><code>const people = [];
+
+class Person &#123;
+  constructor(name) &#123;
+    this.name = name;
+  &#125;
+&#125;
+
+const PersonProxy = new Proxy(Person, &#123;
+  construct() &#123;
+    const newTarget = Reflect.construct(...arguments);
+    people.push(newTarget);
+    return newTarget;
+  &#125;,
+&#125;);
+
+new PersonProxy(&#39;john&#39;);
+new PersonProxy(&#39;jack&#39;);
+
+console.log(people); // [ Person &#123; name: &#39;john&#39; &#125;, Person &#123; name: &#39;jack&#39; &#125; ]
+</code></pre>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>代理是 ECMAScript 6 新增的令人兴奋和动态十足的新特性。尽管不支持向后兼容，但它开辟出了一片前所未有的 JavaScript 元编程及抽象的新天地。</p>
+<p>从宏观上看，代理是真实 JavaScript 对象的透明抽象层。代理可以定义包含捕获器的处理程序对象，而这些捕获器可以拦截绝大部分 JavaScript 的基本操作和方法。在这个捕获器处理程序中，可以修改任何基本操作的行为，当然前提是遵从捕获器不变式。</p>
+<p>与代理如影随形的反射 API，则封装了一整套与捕获器拦截的操作相对应的方法。可以把反射 API 看作一套基本操作，这些操作是绝大部分 JavaScript 对象 API 的基础。</p>
+<p>代理的应用场景是不可限量的。开发者使用它可以创建出各种编码模式，比如（但远远不限于）跟踪属性访问、隐藏属性、阻止修改或删除属性、函数参数验证、构造函数参数验证、数据绑定，以及可观察对象。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/javascript/" rel="tag"><i class="fa fa-tag"></i> javascript</a>
+              <a href="/tags/%E4%BB%A3%E7%90%86/" rel="tag"><i class="fa fa-tag"></i> 代理</a>
+              <a href="/tags/Proxy/" rel="tag"><i class="fa fa-tag"></i> Proxy</a>
+              <a href="/tags/%E5%8F%8D%E5%B0%84/" rel="tag"><i class="fa fa-tag"></i> 反射</a>
+              <a href="/tags/Reflect/" rel="tag"><i class="fa fa-tag"></i> Reflect</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/06/28/%E8%AF%97%E8%AF%8D/%E6%B1%9F%E9%9B%AA/" rel="prev" title="江雪">
+      <i class="fa fa-chevron-left"></i> 江雪
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%A3%E7%90%86%E4%B8%8E%E5%8F%8D%E5%B0%84"><span class="nav-number">1.</span> <span class="nav-text">代理与反射</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E4%BB%A3%E7%90%86"><span class="nav-number">1.1.</span> <span class="nav-text">创建代理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9A%E4%B9%89%E6%8D%95%E8%8E%B7%E5%99%A8"><span class="nav-number">1.2.</span> <span class="nav-text">定义捕获器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8D%95%E8%8E%B7%E5%99%A8%E5%8F%82%E6%95%B0%E5%92%8C%E5%8F%8D%E5%B0%84-API"><span class="nav-number">1.3.</span> <span class="nav-text">捕获器参数和反射 API</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%AF%E6%92%A4%E9%94%80%E4%BB%A3%E7%90%86"><span class="nav-number">1.4.</span> <span class="nav-text">可撤销代理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E5%B1%82%E4%BB%A3%E7%90%86"><span class="nav-number">1.5.</span> <span class="nav-text">多层代理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%A3%E7%90%86%E6%8D%95%E8%8E%B7%E5%99%A8%E4%B8%8E%E5%8F%8D%E5%B0%84%E6%96%B9%E6%B3%95"><span class="nav-number">1.6.</span> <span class="nav-text">代理捕获器与反射方法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%A3%E7%90%86%E6%A8%A1%E5%BC%8F"><span class="nav-number">2.</span> <span class="nav-text">代理模式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E8%B7%9F%E8%B8%AA%E5%B1%9E%E6%80%A7%E8%AE%BF%E9%97%AE"><span class="nav-number">2.1.</span> <span class="nav-text">1. 跟踪属性访问</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E9%9A%90%E8%97%8F%E5%B1%9E%E6%80%A7"><span class="nav-number">2.2.</span> <span class="nav-text">2. 隐藏属性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E5%B1%9E%E6%80%A7%E9%AA%8C%E8%AF%81"><span class="nav-number">2.3.</span> <span class="nav-text">3. 属性验证</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E5%87%BD%E6%95%B0%E4%B8%8E%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0%E5%8F%82%E6%95%B0%E9%AA%8C%E8%AF%81"><span class="nav-number">2.4.</span> <span class="nav-text">4. 函数与构造函数参数验证</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E6%95%B0%E6%8D%AE%E7%BB%91%E5%AE%9A%E4%B8%8E%E5%8F%AF%E8%A7%82%E5%AF%9F%E5%AF%B9%E8%B1%A1"><span class="nav-number">2.5.</span> <span class="nav-text">5. 数据绑定与可观察对象</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="barretyi"
+      src="https://avatars.githubusercontent.com/u/7858692?v=4">
+  <p class="site-author-name" itemprop="name">barretyi</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">barretyi</span>
+</div>
+
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : 'b5ec53da6aa0c8ca1182',
+      clientSecret: 'a8ec2da84dfc54dd931c1c04c56d4c10c873879e',
+      repo        : 'peipeihai.github.io',
+      owner       : 'peipeihai',
+      admin       : ['peipeihai'],
+      id          : '3efcbefd10249c08ba88d8f2bf1e1086',
+        language: 'zh-CN',
+      distractionFreeMode: false
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>
