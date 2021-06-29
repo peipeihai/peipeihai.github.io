@@ -1,46 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>遇见春天遇见你</title>
-    <url>/2021/06/22/%E8%AF%97%E8%AF%8D/%E9%81%87%E8%A7%81%E6%98%A5%E5%A4%A9%E9%81%87%E8%A7%81%E4%BD%A0/</url>
-    <content><![CDATA[<p>沾衣欲湿杏花雨，春风十里不如你。</p>
-<p>东晋永和年间，一个叫祝英台的姑娘，女扮男装，在一个明媚的春天，走出家门，去杭城求学，在春天的路上，他碰到了一个叫梁山伯的小伙子，他们草桥结拜，开始了一段化蝶的传说。一千多年来，你依旧可以在花海树影中，看到他们双宿双飞，为爱徘徊。</p>
-<!-- 这是注释：下面的标签表示文章只显示之前的内容作为摘要 -->
-<span id="more"></span>
-
-<p>东晋咸安年间，正当壮年的王献之走出家门，在桃花汛到来的时节，来到金陵的河边，在一个渡口，碰到一个叫桃叶的姑娘，从此金风玉露一相逢，便胜却人间无数。后来这个渡口也因为他们的相遇，从此被叫做桃叶渡。</p>
-<p>大唐贞元十一年，落榜的考生崔护，在百无聊赖中去郊外春游，只是因为口渴讨水，便遇到一个叫绛娘的姑娘。第二年，他念念不忘，又有回想，又在春天重游故地，在绛娘家的门上，留下一首绝句。去年今日此门中，人面桃花相映红，人面不知何处去，桃花依旧笑春风。绛娘因此死，绛娘因此生，崔护也因此名传千古。</p>
-<p>大唐元和四年，三十岁的袁震任监察御史，出使西蜀，当时正值春天，意气风发的袁震来到西川，和才女薛涛在那个山花烂漫的春天里，开始了一段惊天动地的姐弟恋。</p>
-<p>事实上，春天的故事远不止这些。</p>
-<p>墙头马上里的李千金，只因为是春天，忍不住站在墙边的软梯上，探头向外一望，就望见了那个比裴勇俊还要帅上几分的裴少俊。据说，唐伯虎也是在春游灵隐寺的时候，初见秋香，惊为天人。浮生六记里的沈复和芸娘，他们的春游更成为那个时代的经典。至于白娘子之遇许仙，完全是因为一千七百年前的一个小牧童，在春天放牧的时候，救了一小白蛇，然后才有了一千七百年后的西湖边的春天，他们断桥的遇见。</p>
-<p>所以美丽的春天，不适合做宅女，不适合做宅男。</p>
-<p>春天万物生发，生机盎然，适合走出门去，在生命最好的时候，让上苍恩赐一场遇见。</p>
-<p>春风十里不如你啊，从一个日子走向另外一个日子，从一个春天走向另外一个春天，从一个自己走向另外一个自己。</p>
-<p>跋涉的时候，遇见风遇见雨，遇见他们，遇见星辰。</p>
-<p>驻足的时候，遇见来，遇见去，遇见欢喜。</p>
-<p>人生就是在路上，路上最大的幸福，就是遇见春天，遇见你。</p>
-]]></content>
-      <categories>
-        <category>诗词</category>
-      </categories>
-      <tags>
-        <tag>诗词</tag>
-        <tag>春天</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>江雪</title>
-    <url>/2021/06/28/%E8%AF%97%E8%AF%8D/%E6%B1%9F%E9%9B%AA/</url>
-    <content><![CDATA[]]></content>
-      <categories>
-        <category>诗词</category>
-      </categories>
-      <tags>
-        <tag>诗词</tag>
-        <tag>柳宗元</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>javascript中的代理与反射</title>
     <url>/2021/06/28/javascript/javascript%E4%B8%AD%E7%9A%84%E4%BB%A3%E7%90%86%E4%B8%8E%E5%8F%8D%E5%B0%84/</url>
     <content><![CDATA[<p>ECMAScript6 新增的代理和反射为开发者提供了拦截并向基本操作嵌入额外行为的能力。具体地说，可以给目标对象定义一个关联的代理对象，而这个代理对象可以作为抽象的目标对象来使用。在对目标对象的各种操作影响目标对象之前，可以在代理对象中对这些操作加以控制。在任何可以使用目标对象的地方，都可以通过同样的方式来使用与之关联的代理对象。</p>
@@ -488,6 +448,116 @@ new Van(); // Error: Inheriting class must define foo()
         <tag>javascript</tag>
         <tag>面向对象</tag>
         <tag>原型继承</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>前端好文</title>
+    <url>/2021/06/29/web%E5%89%8D%E7%AB%AF/%E5%89%8D%E7%AB%AF%E5%A5%BD%E6%96%87/</url>
+    <content><![CDATA[<p>日常收集的关于前端开发的优秀文章，多读多消化。</p>
+<!-- 这是注释：下面的标签表示文章只显示之前的内容作为摘要 -->
+<span id="more"></span>
+
+<ul>
+<li><p><a href="https://developer.mozilla.org/zh-CN/docs/Web/API">web API 接口参考</a></p>
+</li>
+<li><p><a href="https://developer.mozilla.org/zh-CN/docs/Web/Events">web 事件参考</a></p>
+</li>
+<li><p><a href="https://iwiki.woa.com/pages/viewpage.action?pageId=375828171">前端监控实现原理</a></p>
+</li>
+<li><p><a href="http://km.oa.com/group/sitepoint/articles/show/364557">前端监控实现思路</a></p>
+</li>
+<li><p><a href="http://km.oa.com/group/32560/articles/show/365524">emonitor 前端监控实现</a></p>
+</li>
+<li><p><a href="https://www.wxapp-union.com/article-6184-1.html">小程序监控</a></p>
+</li>
+<li><p><a href="https://juejin.cn/post/6844903617292402702">小程序异常监控收集</a></p>
+</li>
+<li><p><a href="http://www.ruanyifeng.com/blog/2013/01/javascript_source_map.html">JavaScript Source Map 详解</a></p>
+</li>
+<li><p><a href="https://mp.weixin.qq.com/s/1TQwNx0Q69qEBcoXwJ-Vpg">来看看字节是如何做前端异常监控的，source 简介</a></p>
+</li>
+<li><p><a href="https://mp.weixin.qq.com/s/rJ0yMBcDvm9KD0OF2gLfAA">从微服务到微前端：浅谈微前端的设计思想</a></p>
+</li>
+<li><p><a href="https://overreacted.io/zh-hans/a-complete-guide-to-useeffect/">useEffect 完整指南</a></p>
+</li>
+<li><p><a href="https://mp.weixin.qq.com/s/JURLrg4VCBDCN3vttV4ahQ">react hooks 原理</a></p>
+</li>
+<li><p>精读《React Hooks》</p>
+</li>
+<li><p>精读《怎么用 React Hooks 造轮子》</p>
+</li>
+<li><p>精读《useEffect 完全指南》</p>
+</li>
+<li><p>精读《Function VS Class 组件》</p>
+</li>
+<li><p><a href="https://mp.weixin.qq.com/s/-dVGGoVA8kpv9PaSNMoMSg">React 性能优化完全指南</a></p>
+</li>
+<li><p><a href="https://mp.weixin.qq.com/s/UPy5Qwesz8ia3XpjrUJ4oQ">深入理解 React Router：Context、Hooks、Refs、Memo 特性讲解</a></p>
+</li>
+<li><p><a href="https://github.com/linqinghao/blog/issues/18">Typescript 中的装饰器与元数据反射</a></p>
+</li>
+<li><p><a href="https://mp.weixin.qq.com/s/PFgc8xD7gT40-9qXNTpk7A">Typescript 装饰器详解</a></p>
+</li>
+<li><p><a href="https://segmentfault.com/a/1190000021508564">使用 typescript 装饰器构建 nodejs 路由</a></p>
+</li>
+<li><p><a href="https://zhuanlan.zhihu.com/p/215385588">使用 typescript 装饰器构建 nodejs 路由</a></p>
+</li>
+<li><p><a href="https://mp.weixin.qq.com/s/QcVA6yEw3NvDV1ZLtoMcug">手写一个脚手架</a></p>
+</li>
+<li><p><a href="https://segmentfault.com/a/1190000020335010?utm_source=sf-similar-article">手把手教你搭建脚手架工具</a></p>
+</li>
+<li><p><a href="http://www.semlinker.com/categories/node-js/">深入学习 nodejs 系列</a></p>
+</li>
+<li><p><a href="https://yjhjstz.gitbooks.io/deep-into-node/content/">deep-into-node</a></p>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>前端好文</category>
+      </categories>
+      <tags>
+        <tag>web前端</tag>
+        <tag>优秀文章</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>江雪</title>
+    <url>/2021/06/28/%E8%AF%97%E8%AF%8D/%E6%B1%9F%E9%9B%AA/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>诗词</category>
+      </categories>
+      <tags>
+        <tag>诗词</tag>
+        <tag>柳宗元</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>遇见春天遇见你</title>
+    <url>/2021/06/22/%E8%AF%97%E8%AF%8D/%E9%81%87%E8%A7%81%E6%98%A5%E5%A4%A9%E9%81%87%E8%A7%81%E4%BD%A0/</url>
+    <content><![CDATA[<p>沾衣欲湿杏花雨，春风十里不如你。</p>
+<p>东晋永和年间，一个叫祝英台的姑娘，女扮男装，在一个明媚的春天，走出家门，去杭城求学，在春天的路上，他碰到了一个叫梁山伯的小伙子，他们草桥结拜，开始了一段化蝶的传说。一千多年来，你依旧可以在花海树影中，看到他们双宿双飞，为爱徘徊。</p>
+<!-- 这是注释：下面的标签表示文章只显示之前的内容作为摘要 -->
+<span id="more"></span>
+
+<p>东晋咸安年间，正当壮年的王献之走出家门，在桃花汛到来的时节，来到金陵的河边，在一个渡口，碰到一个叫桃叶的姑娘，从此金风玉露一相逢，便胜却人间无数。后来这个渡口也因为他们的相遇，从此被叫做桃叶渡。</p>
+<p>大唐贞元十一年，落榜的考生崔护，在百无聊赖中去郊外春游，只是因为口渴讨水，便遇到一个叫绛娘的姑娘。第二年，他念念不忘，又有回想，又在春天重游故地，在绛娘家的门上，留下一首绝句。去年今日此门中，人面桃花相映红，人面不知何处去，桃花依旧笑春风。绛娘因此死，绛娘因此生，崔护也因此名传千古。</p>
+<p>大唐元和四年，三十岁的袁震任监察御史，出使西蜀，当时正值春天，意气风发的袁震来到西川，和才女薛涛在那个山花烂漫的春天里，开始了一段惊天动地的姐弟恋。</p>
+<p>事实上，春天的故事远不止这些。</p>
+<p>墙头马上里的李千金，只因为是春天，忍不住站在墙边的软梯上，探头向外一望，就望见了那个比裴勇俊还要帅上几分的裴少俊。据说，唐伯虎也是在春游灵隐寺的时候，初见秋香，惊为天人。浮生六记里的沈复和芸娘，他们的春游更成为那个时代的经典。至于白娘子之遇许仙，完全是因为一千七百年前的一个小牧童，在春天放牧的时候，救了一小白蛇，然后才有了一千七百年后的西湖边的春天，他们断桥的遇见。</p>
+<p>所以美丽的春天，不适合做宅女，不适合做宅男。</p>
+<p>春天万物生发，生机盎然，适合走出门去，在生命最好的时候，让上苍恩赐一场遇见。</p>
+<p>春风十里不如你啊，从一个日子走向另外一个日子，从一个春天走向另外一个春天，从一个自己走向另外一个自己。</p>
+<p>跋涉的时候，遇见风，遇见雨，遇见他们，遇见星辰。</p>
+<p>驻足的时候，遇见来，遇见去，遇见欢喜。</p>
+<p>人生就是在路上，路上最大的幸福，就是遇见春天，遇见你。</p>
+]]></content>
+      <categories>
+        <category>诗词</category>
+      </categories>
+      <tags>
+        <tag>诗词</tag>
+        <tag>春天</tag>
       </tags>
   </entry>
 </search>
