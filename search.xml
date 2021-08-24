@@ -954,4 +954,79 @@ acknowledgement.
         <tag>计算机网络</tag>
       </tags>
   </entry>
+  <entry>
+    <title>elasticeSearch简介</title>
+    <url>/2021/08/24/elasticSearch/elasticSearch%E7%AE%80%E4%BB%8B/</url>
+    <content><![CDATA[<p>Elastic Search 简介。</p>
+<!-- 这是注释：下面的标签表示文章只显示之前的内容作为摘要 -->
+<span id="more"></span>
+
+<h1 id="Elastic-Search-应用场景"><a href="#Elastic-Search-应用场景" class="headerlink" title="Elastic Search 应用场景"></a>Elastic Search 应用场景</h1><p>ES是一个分布式文档存储引擎，支持近乎实时(NRT, Near-RealTime)的搜索功能。主要应用场景如下：</p>
+<ol>
+<li>实现网站或App的搜索功能</li>
+<li>作为存储引擎和数据分析</li>
+<li>机器学习领域实时数据建模</li>
+<li>管理、集成、分析空间信息数据(GIS)</li>
+<li>生物信息领域存储和处理遗传信息</li>
+<li>其他场景…</li>
+</ol>
+<h1 id="Elastic-Search-基础术语"><a href="#Elastic-Search-基础术语" class="headerlink" title="Elastic Search 基础术语"></a>Elastic Search 基础术语</h1><ul>
+<li>索引(index): 类似于关系数据库中的 database，是一组文档的集合</li>
+<li>文档(document): 键值对的集合，可以理解为 JSON 对象</li>
+</ul>
+<p>ES内部高效存储着文档的数据，文本数据以<code>倒排索引(inverted indices)</code>的形式存储，数值、地理信息等数据则存储在<code>BKD Tree</code>这种数据结构中，所以ES查询速度很快。</p>
+<h1 id="Schema-less"><a href="#Schema-less" class="headerlink" title="Schema-less"></a>Schema-less</h1><p>ES 无需提前定义文档的格式(Schema), 可以存储包含任意字段的文档数据， ES会自动判断所有键对应值的格式并妥善存储。但是，实际使用中建议还是提前定义数据格式(Mapping)。<br>提前定义Mapping有如下好处：</p>
+<ul>
+<li>可以区分全文索引字段和精确值字段</li>
+<li>可以执行特定于语言的文本分析</li>
+<li>可以优化部分匹配的字段</li>
+<li>可以使用自定义的日期格式</li>
+<li>可以使用<code>geo_point</code>和<code>geo_shape</code>数据类型，这些数据类型不能被 ES 自动识别</li>
+</ul>
+<h1 id="可以为同一个字段建立不同的索引方式"><a href="#可以为同一个字段建立不同的索引方式" class="headerlink" title="可以为同一个字段建立不同的索引方式"></a>可以为同一个字段建立不同的索引方式</h1><p>例如，可以将字符串同时索引为文本字段(text filed) 和关键字(keyword)字段。前者利于全文检索，后者则可以用于排序和聚合。</p>
+<p>同时，也可以选择使用多个语言分析器来处理包含用户输入的字符串字段的内容。</p>
+<h1 id="数据查询"><a href="#数据查询" class="headerlink" title="数据查询"></a>数据查询</h1><p>ES 基于 Apache Lucene 搜索引擎，提供了一套便于使用、功能强大的 REST API，并且提供了常用编程语言的 SDK。这套 REST API 支持的查询有：</p>
+<ul>
+<li>结构化查询(structured queries): 类似于在 SQL 中构造的查询类型</li>
+<li>全文索引查询(full text queries): 查询字符串匹配的所有文档并按<code>相关性(relevance)</code>排序返回它们</li>
+<li>复合查询(complex queries): 综合前两者</li>
+</ul>
+<p>除了搜索单个术语(term)外，ES 还支持如下查询：</p>
+<ul>
+<li>短语搜索</li>
+<li>相似性搜索</li>
+<li>前缀搜索</li>
+<li>自动补全搜索</li>
+</ul>
+<p>可以使用 Elasticsearch 的综合 JSON 样式查询语言 (Query DSL) 访问所有这些搜索功能。</p>
+<h1 id="数据分析"><a href="#数据分析" class="headerlink" title="数据分析"></a>数据分析</h1><p>Elasticsearch 聚合(aggregations)功能能够构建复杂的数据摘要并深入了解关键指标(metrics)、模式(patterns)和趋势(trends)。</p>
+<p>例如： 除了常见的<code>从草堆里捞针</code>这种查询，ES还能回答下列问题：</p>
+<ol>
+<li>总共有多少根针？</li>
+<li>这些针的平均长度是多少？</li>
+<li>不同制造商制造的针的长度中位数是多少？</li>
+<li>最受欢迎的针头制造商是哪家？</li>
+</ol>
+<p>更重要的是，聚合与搜索请求一起运行。可以在单个请求中对相同数据同时搜索文档、过滤结果和执行分析。</p>
+<h1 id="可扩展性和弹性：集群-cluster-、节点-node-、分片-shard"><a href="#可扩展性和弹性：集群-cluster-、节点-node-、分片-shard" class="headerlink" title="可扩展性和弹性：集群(cluster)、节点(node)、分片(shard)"></a>可扩展性和弹性：集群(cluster)、节点(node)、分片(shard)</h1><p>ES 是一个分布式的存储系统，可以很容易进行弹性伸缩。将新节点加入集群后，集群会自动进行负载均衡，将数据分布到不同的节点。</p>
+<p>如何做到的？</p>
+<p>一个索引是包含一个或多个物理分片的逻辑分组，其中每个分片实际上是一个独立的索引。通过将索引中的文档分布在多个分片中，并将这些分片分布在多个节点上，Elasticsearch 可以确保冗余，这既可以防止硬件故障，又可以在将节点添加到集群时增加查询容量。<br>随着集群的增长（或缩小），Elasticsearch 会自动迁移分片以重新平衡集群。</p>
+<p>分片有两种类型：主分片(primaries)和副本(replicas)。索引中的每个文档都属于一个主分片。副本分片是主分片的副本。副本提供数据的冗余副本，以防止硬件故障并增加处理读取请求（如搜索或检索文档）的容量。</p>
+<h1 id="分片数量"><a href="#分片数量" class="headerlink" title="分片数量"></a>分片数量</h1><p>索引中的主分片数量在创建索引时是固定的，但副本分片的数量可以随时更改，而不会中断索引或查询操作。</p>
+<p>关于分片大小和为索引配置的主分片数量，有许多性能考虑和权衡。分片越多，维护这些索引的开销就越大。分片大小越大，当 Elasticsearch 需要重新平衡集群时，移动分片所需的时间就越长。<br>查询大量小分片会使每个分片的处理速度更快，但更多查询意味着更多开销，因此查询较少数量的较大分片可能会更快。简而言之……视情况而定。</p>
+<ul>
+<li>将平均分片大小保持在几 GB 到几十 GB 之间。对于具有基于时间的数据的用例，通常会看到 20GB 到 40GB 范围内的分片。</li>
+<li>避免大量碎片问题。一个节点可以容纳的分片数量与可用的堆空间成正比。作为一般规则，每 GB 堆空间的分片数应小于 20。</li>
+</ul>
+<h1 id="避免灾难"><a href="#避免灾难" class="headerlink" title="避免灾难"></a>避免灾难</h1><p>Avoid putting all of your eggs in one basket（不要把鸡蛋放在同一个篮子里）。</p>
+<p>跨集群备份： Cross-cluster replication (CCR)</p>
+]]></content>
+      <categories>
+        <category>ELK</category>
+      </categories>
+      <tags>
+        <tag>elk</tag>
+        <tag>elastic search</tag>
+      </tags>
+  </entry>
 </search>
