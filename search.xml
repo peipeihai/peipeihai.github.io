@@ -1,128 +1,466 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>javascript中的垃圾回收</title>
-    <url>/2021/06/25/javascript/javascript%E4%B8%AD%E7%9A%84%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/</url>
-    <content><![CDATA[<p>在浏览器的发展史上，用到过两种主要的标记策略：标记清理和引用计数。</p>
+    <title>elasticeSearch简介</title>
+    <url>/2021/08/24/elasticSearch/elasticSearch%E7%AE%80%E4%BB%8B/</url>
+    <content><![CDATA[<p>Elastic Search 简介。</p>
 <!-- 这是注释：下面的标签表示文章只显示之前的内容作为摘要 -->
 <span id="more"></span>
 
-<h2 id="标记清理"><a href="#标记清理" class="headerlink" title="标记清理"></a>标记清理</h2><p>JavaScript 最常用的垃圾回收策略是标记清理（mark-and-sweep）。当变量进入上下文，比如在函数内部声明一个变量时，这个变量会被加上存在于上下文中的标记。而在上下文中的变量，逻辑上讲，永远不应该释放它们的内存，因为只要上下文中的代码在运行，就有可能用到它们。当变量离开上下文时，也会被加上离开上下文的标记。</p>
-<p>给变量加标记的方式有很多种。比如，当变量进入上下文时，反转某一位；或者可以维护“在上下文中”和“不在上下文中”两个变量列表，可以把变量从一个列表转移到另一个列表。标记过程的实现并不重要，关键是策略。<br>垃圾回收程序运行的时候，会标记内存中存储的所有变量（记住，标记方法有很多种）。然后，它会将所有在上下文中的变量，以及被在上下文中的变量引用的变量的标记去掉。在此之后再被加上标记的变量就是待删除的了，原因是任何在上下文中的变量都访问不到它们了。随后垃圾回收程序做一次内存清理，销毁带标记的所有值并收回它们的内存。</p>
-<p>到了 2008 年，IE、Firefox、Opera、Chrome 和 Safari 都在自己的 JavaScript 实现中采用标记清理（或其变体），只是在运行垃圾回收的频率上有所差异。</p>
-<h2 id="引用计数"><a href="#引用计数" class="headerlink" title="引用计数"></a>引用计数</h2><p>另一种没那么常用的垃圾回收策略是引用计数（reference counting）。其思路是对每个值都记录它被引用的次数。声明变量并给它赋一个引用值时，这个值的引用数为 1。<br>如果同一个值又被赋给另一个变量，那么引用数加 1。类似地，如果保存对该值引用的变量被其他值给覆盖了，那么引用数减 1。当一个值的引用数为 0 时，就说明没办法再访问到这个值了，因此可以安全地收回其内存了。<br>垃圾回收程序下次运行的时候就会释放引用数为 0 的值的内存。<br>引用计数最早由 Netscape Navigator 3.0 采用，但很快就遇到了严重的问题：循环引用。所谓循环引用，就是对象 A 有一个指针指向对象 B，而对象 B 也引用了对象 A。<br>为避免类似的循环引用问题，应该在确保不使用的情况下切断原生 JavaScript 对象与 DOM 元素之间的连接。</p>
-<p>比如，通过以下代码可以清除前面的例子中建立的循环引用：</p>
-<pre><code>myObject.element = null;￼
-element.someObject = null;
-</code></pre>
-<p>把变量设置为 null 实际上会切断变量与其之前引用值之间的关系。当下次垃圾回收程序运行时，这些值就会被删除，内存也会被回收。</p>
-<h2 id="内存泄漏"><a href="#内存泄漏" class="headerlink" title="内存泄漏"></a>内存泄漏</h2><p>写得不好的 JavaScript 可能出现难以察觉且有害的内存泄漏问题。在内存有限的设备上，或者在函数会被调用很多次的情况下，内存泄漏可能是个大问题。JavaScript 中的内存泄漏大部分是由不合理的引用导致的。</p>
+<h1 id="Elastic-Search-应用场景"><a href="#Elastic-Search-应用场景" class="headerlink" title="Elastic Search 应用场景"></a>Elastic Search 应用场景</h1><p>ES是一个分布式文档存储引擎，支持近乎实时(NRT, Near-RealTime)的搜索功能。主要应用场景如下：</p>
 <ol>
-<li>意外声明全局变量是最常见但也最容易修复的内存泄漏问题。</li>
-<li>定时器也可能会悄悄地导致内存泄漏。下面的代码中，定时器的回调通过闭包引用了外部变量：</li>
+<li>实现网站或App的搜索功能</li>
+<li>作为存储引擎和数据分析</li>
+<li>机器学习领域实时数据建模</li>
+<li>管理、集成、分析空间信息数据(GIS)</li>
+<li>生物信息领域存储和处理遗传信息</li>
+<li>其他场景…</li>
 </ol>
-<pre><code>let name = &#39;Jake&#39;;￼
-setInterval(() =&gt; &#123;￼ console.log(name);￼ &#125;, 100);
-</code></pre>
-<p>只要定时器一直运行，回调函数中引用的 name 就会一直占用内存。</p>
-<ol start="3">
-<li>使用 JavaScript 闭包很容易在不知不觉间造成内存泄漏。请看下面的例子：</li>
+<h1 id="Elastic-Search-基础术语"><a href="#Elastic-Search-基础术语" class="headerlink" title="Elastic Search 基础术语"></a>Elastic Search 基础术语</h1><ul>
+<li>索引(index): 类似于关系数据库中的 database，是一组文档的集合</li>
+<li>文档(document): 键值对的集合，可以理解为 JSON 对象</li>
+</ul>
+<p>ES内部高效存储着文档的数据，文本数据以<code>倒排索引(inverted indices)</code>的形式存储，数值、地理信息等数据则存储在<code>BKD Tree</code>这种数据结构中，所以ES查询速度很快。</p>
+<h1 id="Schema-less"><a href="#Schema-less" class="headerlink" title="Schema-less"></a>Schema-less</h1><p>ES 无需提前定义文档的格式(Schema), 可以存储包含任意字段的文档数据， ES会自动判断所有键对应值的格式并妥善存储。但是，实际使用中建议还是提前定义数据格式(Mapping)。<br>提前定义Mapping有如下好处：</p>
+<ul>
+<li>可以区分全文索引字段和精确值字段</li>
+<li>可以执行特定于语言的文本分析</li>
+<li>可以优化部分匹配的字段</li>
+<li>可以使用自定义的日期格式</li>
+<li>可以使用<code>geo_point</code>和<code>geo_shape</code>数据类型，这些数据类型不能被 ES 自动识别</li>
+</ul>
+<h1 id="可以为同一个字段建立不同的索引方式"><a href="#可以为同一个字段建立不同的索引方式" class="headerlink" title="可以为同一个字段建立不同的索引方式"></a>可以为同一个字段建立不同的索引方式</h1><p>例如，可以将字符串同时索引为文本字段(text filed) 和关键字(keyword)字段。前者利于全文检索，后者则可以用于排序和聚合。</p>
+<p>同时，也可以选择使用多个语言分析器来处理包含用户输入的字符串字段的内容。</p>
+<h1 id="数据查询"><a href="#数据查询" class="headerlink" title="数据查询"></a>数据查询</h1><p>ES 基于 Apache Lucene 搜索引擎，提供了一套便于使用、功能强大的 REST API，并且提供了常用编程语言的 SDK。这套 REST API 支持的查询有：</p>
+<ul>
+<li>结构化查询(structured queries): 类似于在 SQL 中构造的查询类型</li>
+<li>全文索引查询(full text queries): 查询字符串匹配的所有文档并按<code>相关性(relevance)</code>排序返回它们</li>
+<li>复合查询(complex queries): 综合前两者</li>
+</ul>
+<p>除了搜索单个术语(term)外，ES 还支持如下查询：</p>
+<ul>
+<li>短语搜索</li>
+<li>相似性搜索</li>
+<li>前缀搜索</li>
+<li>自动补全搜索</li>
+</ul>
+<p>可以使用 Elasticsearch 的综合 JSON 样式查询语言 (Query DSL) 访问所有这些搜索功能。</p>
+<h1 id="数据分析"><a href="#数据分析" class="headerlink" title="数据分析"></a>数据分析</h1><p>Elasticsearch 聚合(aggregations)功能能够构建复杂的数据摘要并深入了解关键指标(metrics)、模式(patterns)和趋势(trends)。</p>
+<p>例如： 除了常见的<code>从草堆里捞针</code>这种查询，ES还能回答下列问题：</p>
+<ol>
+<li>总共有多少根针？</li>
+<li>这些针的平均长度是多少？</li>
+<li>不同制造商制造的针的长度中位数是多少？</li>
+<li>最受欢迎的针头制造商是哪家？</li>
 </ol>
-<pre><code>let outer = function() &#123;￼
-    let name = &#39;Jake&#39;;￼
-    return function() &#123;￼
-        return name;
-￼ &#125;;￼
-&#125;;
-</code></pre>
-<p>调用 outer()会导致分配给 name 的内存被泄漏。以上代码执行后创建了一个内部闭包，只要返回的函数存在就不能清理 name，因为闭包一直在引用着它。假如 name 的内容很大（不止是一个小字符串），那可能就是个大问题了。</p>
+<p>更重要的是，聚合与搜索请求一起运行。可以在单个请求中对相同数据同时搜索文档、过滤结果和执行分析。</p>
+<h1 id="可扩展性和弹性：集群-cluster-、节点-node-、分片-shard"><a href="#可扩展性和弹性：集群-cluster-、节点-node-、分片-shard" class="headerlink" title="可扩展性和弹性：集群(cluster)、节点(node)、分片(shard)"></a>可扩展性和弹性：集群(cluster)、节点(node)、分片(shard)</h1><p>ES 是一个分布式的存储系统，可以很容易进行弹性伸缩。将新节点加入集群后，集群会自动进行负载均衡，将数据分布到不同的节点。</p>
+<p>如何做到的？</p>
+<p>一个索引是包含一个或多个物理分片的逻辑分组，其中每个分片实际上是一个独立的索引。通过将索引中的文档分布在多个分片中，并将这些分片分布在多个节点上，Elasticsearch 可以确保冗余，这既可以防止硬件故障，又可以在将节点添加到集群时增加查询容量。<br>随着集群的增长（或缩小），Elasticsearch 会自动迁移分片以重新平衡集群。</p>
+<p>分片有两种类型：主分片(primaries)和副本(replicas)。索引中的每个文档都属于一个主分片。副本分片是主分片的副本。副本提供数据的冗余副本，以防止硬件故障并增加处理读取请求（如搜索或检索文档）的容量。</p>
+<h1 id="分片数量"><a href="#分片数量" class="headerlink" title="分片数量"></a>分片数量</h1><p>索引中的主分片数量在创建索引时是固定的，但副本分片的数量可以随时更改，而不会中断索引或查询操作。</p>
+<p>关于分片大小和为索引配置的主分片数量，有许多性能考虑和权衡。分片越多，维护这些索引的开销就越大。分片大小越大，当 Elasticsearch 需要重新平衡集群时，移动分片所需的时间就越长。<br>查询大量小分片会使每个分片的处理速度更快，但更多查询意味着更多开销，因此查询较少数量的较大分片可能会更快。简而言之……视情况而定。</p>
+<ul>
+<li>将平均分片大小保持在几 GB 到几十 GB 之间。对于具有基于时间的数据的用例，通常会看到 20GB 到 40GB 范围内的分片。</li>
+<li>避免大量碎片问题。一个节点可以容纳的分片数量与可用的堆空间成正比。作为一般规则，每 GB 堆空间的分片数应小于 20。</li>
+</ul>
+<h1 id="避免灾难"><a href="#避免灾难" class="headerlink" title="避免灾难"></a>避免灾难</h1><p>Avoid putting all of your eggs in one basket（不要把鸡蛋放在同一个篮子里）。</p>
+<p>跨集群备份： Cross-cluster replication (CCR)</p>
 ]]></content>
       <categories>
-        <category>web前端</category>
+        <category>ELK</category>
       </categories>
       <tags>
-        <tag>javascript</tag>
-        <tag>垃圾回收</tag>
+        <tag>elk</tag>
+        <tag>elastic search</tag>
       </tags>
   </entry>
   <entry>
-    <title>前端好文</title>
-    <url>/2021/06/29/web%E5%89%8D%E7%AB%AF/%E5%89%8D%E7%AB%AF%E5%A5%BD%E6%96%87/</url>
-    <content><![CDATA[<p>日常收集的关于前端开发的优秀文章，多读多消化。</p>
+    <title>动态映射与显式映射</title>
+    <url>/2021/08/25/elasticSearch/%E5%8A%A8%E6%80%81%E6%98%A0%E5%B0%84%E4%B8%8E%E6%98%BE%E5%BC%8F%E6%98%A0%E5%B0%84/</url>
+    <content><![CDATA[<p>Mapping（映射）是指如何定义一个文档(document)结构。每个文档都是一组字段的集合，每个字段都有自己的数据类型。定义一个映射，相当于定义传统关系型数据库中的表结构。</p>
 <!-- 这是注释：下面的标签表示文章只显示之前的内容作为摘要 -->
 <span id="more"></span>
 
-<ul>
-<li><p><a href="https://developer.mozilla.org/zh-CN/docs/Web/API">web API 接口参考</a></p>
-</li>
-<li><p><a href="https://developer.mozilla.org/zh-CN/docs/Web/Events">web 事件参考</a></p>
-</li>
-<li><p><a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference">javascript 参考 MDN</a></p>
-</li>
-<li><p><a href="https://iwiki.woa.com/pages/viewpage.action?pageId=375828171">前端监控实现原理</a></p>
-</li>
-<li><p><a href="http://km.oa.com/group/sitepoint/articles/show/364557">前端监控实现思路</a></p>
-</li>
-<li><p><a href="http://km.oa.com/group/32560/articles/show/365524">emonitor 前端监控实现</a></p>
-</li>
-<li><p><a href="https://www.wxapp-union.com/article-6184-1.html">小程序监控</a></p>
-</li>
-<li><p><a href="https://juejin.cn/post/6844903617292402702">小程序异常监控收集</a></p>
-</li>
-<li><p><a href="http://www.ruanyifeng.com/blog/2013/01/javascript_source_map.html">JavaScript Source Map 详解</a></p>
-</li>
-<li><p><a href="https://mp.weixin.qq.com/s/1TQwNx0Q69qEBcoXwJ-Vpg">来看看字节是如何做前端异常监控的，source 简介</a></p>
-</li>
-<li><p><a href="https://mp.weixin.qq.com/s/rJ0yMBcDvm9KD0OF2gLfAA">从微服务到微前端：浅谈微前端的设计思想</a></p>
-</li>
-<li><p><a href="https://overreacted.io/zh-hans/a-complete-guide-to-useeffect/">useEffect 完整指南</a></p>
-</li>
-<li><p><a href="https://mp.weixin.qq.com/s/JURLrg4VCBDCN3vttV4ahQ">react hooks 原理</a></p>
-</li>
-<li><p>精读《React Hooks》</p>
-</li>
-<li><p>精读《怎么用 React Hooks 造轮子》</p>
-</li>
-<li><p>精读《useEffect 完全指南》</p>
-</li>
-<li><p>精读《Function VS Class 组件》</p>
-</li>
-<li><p><a href="https://mp.weixin.qq.com/s/-dVGGoVA8kpv9PaSNMoMSg">React 性能优化完全指南</a></p>
-</li>
-<li><p><a href="https://mp.weixin.qq.com/s/UPy5Qwesz8ia3XpjrUJ4oQ">深入理解 React Router：Context、Hooks、Refs、Memo 特性讲解</a></p>
-</li>
-<li><p><a href="https://github.com/linqinghao/blog/issues/18">Typescript 中的装饰器与元数据反射</a></p>
-</li>
-<li><p><a href="https://mp.weixin.qq.com/s/PFgc8xD7gT40-9qXNTpk7A">Typescript 装饰器详解</a></p>
-</li>
-<li><p><a href="https://segmentfault.com/a/1190000021508564">使用 typescript 装饰器构建 nodejs 路由</a></p>
-</li>
-<li><p><a href="https://zhuanlan.zhihu.com/p/215385588">使用 typescript 装饰器构建 nodejs 路由</a></p>
-</li>
-<li><p><a href="https://mp.weixin.qq.com/s/QcVA6yEw3NvDV1ZLtoMcug">手写一个脚手架</a></p>
-</li>
-<li><p><a href="https://segmentfault.com/a/1190000020335010?utm_source=sf-similar-article">手把手教你搭建脚手架工具</a></p>
-</li>
-<li><p><a href="http://www.semlinker.com/categories/node-js/">深入学习 nodejs 系列</a></p>
-</li>
-<li><p><a href="https://yjhjstz.gitbooks.io/deep-into-node/content/">deep-into-node</a></p>
-</li>
-<li><p><a href="https://jishuin.proginn.com/p/763bfbd57afc">虚拟列表实现原理</a></p>
-</li>
-<li><p><a href="https://jishuin.proginn.com/u/548404">这个用户下有些文章质量挺高</a></p>
-</li>
-<li><p><a href="https://jishuin.proginn.com/p/763bfbd4cedb">学会 Proxy 真的可以为所欲为</a></p>
-</li>
-<li><p><a href="https://mp.weixin.qq.com/s/Etied9JkAB2jZUMvD4LWIA">腾讯课堂小程序性能极致优化</a></p>
-</li>
+<h1 id="动态映射-Dynamic-Mapping-和-静态（显式）映射-Explict-Mapping"><a href="#动态映射-Dynamic-Mapping-和-静态（显式）映射-Explict-Mapping" class="headerlink" title="动态映射(Dynamic Mapping) 和 静态（显式）映射(Explict Mapping)"></a>动态映射(Dynamic Mapping) 和 静态（显式）映射(Explict Mapping)</h1><ul>
+<li><code>动态映射</code>：自动检测字段数据类型并添加字段。简单易用，可以随意改变文档结构</li>
+<li><code>显式映射</code>：精细化控制文档中各个字段的数据类型</li>
 </ul>
+<p>可以使用<code>运行时字段(runtime fields)</code>来改变Schema，这样不用重新索引文档。可以搭配索引字段和运行时字段使用，来达到易用性和性能之间的平衡。</p>
+<h1 id="避免映射爆炸-Mapping-Explosion"><a href="#避免映射爆炸-Mapping-Explosion" class="headerlink" title="避免映射爆炸(Mapping Explosion)"></a>避免映射爆炸(Mapping Explosion)</h1><p>在索引中定义太多字段会导致映射爆炸，从而导致内存不足错误或出现难以恢复的情况。例如使用动态映射时，每个新字段都会添加到索引映射中，随着映射的增长，这可能会成为一个问题。<br>使用<code>映射限制(mapping limit settings)</code>设置来限制字段映射的数量（手动或动态创建）并防止文档导致映射爆炸。</p>
+<h1 id="动态映射"><a href="#动态映射" class="headerlink" title="动态映射"></a>动态映射</h1><p>可以通过 <code>dynamic</code> 参数来控制对新增字段类型的解析。参数可取值 <code>true</code> 或 <code>runtime</code>。</p>
+<p>动态模版<code>默认字段映射规则(default dynamic field mapping ruls)</code>如下：</p>
+<p>|  JSON字段类型   | dynamic: true  | dynamic: runtime  |<br>| 单元格          |          单元格 | sdfs              |</p>
+<table>
+<thead>
+<tr>
+<th>JSON字段类型</th>
+<th>dynamic: true</th>
+<th>dynamic: runtime</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>null</td>
+<td>忽略（不增加字段）</td>
+<td>忽略</td>
+</tr>
+<tr>
+<td>true or false</td>
+<td>boolean</td>
+<td>boolean</td>
+</tr>
+<tr>
+<td>double</td>
+<td>float</td>
+<td>double</td>
+</tr>
+<tr>
+<td>integer</td>
+<td>long</td>
+<td>long</td>
+</tr>
+<tr>
+<td>object</td>
+<td>object</td>
+<td>忽略</td>
+</tr>
+<tr>
+<td>array</td>
+<td>取决于第一个非null的元素类型</td>
+<td>取决于第一个非null的元素类型</td>
+</tr>
+<tr>
+<td>日期类型的字符串</td>
+<td>date</td>
+<td>date</td>
+</tr>
+<tr>
+<td>数字类型的字符串</td>
+<td>float or long</td>
+<td>double or long</td>
+</tr>
+<tr>
+<td>不能被解析为日期或数字类型的字符串</td>
+<td>带有keyword子字段的text</td>
+<td>keyword</td>
+</tr>
+</tbody></table>
+<p>可以在整个文档层级或文档内部object层级禁用动态映射，将动态参数设置为 <code>false</code> 会忽略新字段，如果 Elasticsearch 遇到未知字段，则严格拒绝文档。</p>
+<p>可以使用映射更新API来更新 Mapping 的设置。</p>
+<h2 id="日期检测和数字检测"><a href="#日期检测和数字检测" class="headerlink" title="日期检测和数字检测"></a>日期检测和数字检测</h2><p>可以自定义<code>日期检测</code>和<code>数值检测</code>的动态字段映射规则。要定义可应用于其他动态字段的自定义映射规则，可以使用<code>动态模板</code>。</p>
+<p>使用 <code>date_detection</code> 来定义日期检测规则。</p>
+<pre><code>// 禁用日期检测
+PUT my-index-000001
+&#123;
+  &quot;mappings&quot;: &#123;
+    &quot;date_detection&quot;: false
+  &#125;
+&#125;
+
+// 此时字符串被识别为`text`类型
+PUT my-index-000001/_doc/1 
+&#123;
+  &quot;create&quot;: &quot;2015/09/02&quot;
+&#125;
+
+// 定义日期检测规则
+PUT my-index-000001
+&#123;
+  &quot;mappings&quot;: &#123;
+    &quot;dynamic_date_formats&quot;: [&quot;MM/dd/yyyy&quot;]
+  &#125;
+&#125;
+
+PUT my-index-000001/_doc/1
+&#123;
+  &quot;create_date&quot;: &quot;09/25/2015&quot;
+&#125;
+</code></pre>
+<p>使用 <code>numeric_detection</code> 来定义数字检测规则。</p>
+<pre><code>PUT my-index-000001
+&#123;
+  &quot;mappings&quot;: &#123;
+    &quot;numeric_detection&quot;: true
+  &#125;
+&#125;
+
+PUT my-index-000001/_doc/1
+&#123;
+  &quot;my_float&quot;:   &quot;1.0&quot;,  // 被识别为float类型
+  &quot;my_integer&quot;: &quot;1&quot;  // 被识别为long类型
+&#125;
+</code></pre>
+<h2 id="动态模板-Dynamic-Templates"><a href="#动态模板-Dynamic-Templates" class="headerlink" title="动态模板(Dynamic Templates)"></a>动态模板(Dynamic Templates)</h2><p><code>动态模板</code>可以在<code>默认动态字段映射规则</code>之外更好地控制 Elasticsearch 如何映射您的数据。<br>可以通过将 <code>dynamic</code> 参数设置为 <code>true</code> 或 <code>runtime</code> 来启用动态映射。然后，可以使用动态模板来定义自定义映射，这些映射可以根据下列<code>匹配条件(match conditions)</code>应用于动态添加的字段：</p>
+<ol>
+<li><code>match_mapping_type</code> 对 Elasticsearch 检测到的数据类型进行操作</li>
+<li><code>match</code> 和 <code>unmatch</code> 使用模式来匹配字段名称</li>
+<li><code>path_match</code> 和 <code>path_unmatch</code> 对字段的完整路径进行操作</li>
+<li>如果动态模板没有定义 <code>match_mapping_type</code>、<code>match</code> 或 <code>path_match</code>，它将不会匹配任何字段。仍然可以在批量请求的 <code>dynamic_templates</code> 部分按名称引用模板。</li>
+</ol>
+<p>映射规范中，可以使用 <code>&#123;name&#125;</code> 和 <code>&#123;dynamic_type&#125;</code> 模板变量作为占位符。</p>
+<p>可以使用通配符<code>*</code>匹配所有数据类型。</p>
+<h3 id="动态模板"><a href="#动态模板" class="headerlink" title="动态模板"></a>动态模板</h3><p>动态模板被指定为命名对象数组。</p>
+<pre><code>&quot;dynamic_templates&quot;: [
+    &#123;
+      &quot;my_template_name&quot;: &#123; 
+        ... match conditions ...   // 匹配条件可以为：match_mapping_type, match, match_pattern, unmatch, path_match, path_unmatch
+        &quot;mapping&quot;: &#123; ... &#125; 
+      &#125;
+    &#125;,
+    ...
+  ]
+</code></pre>
+<h3 id="match-mapping-type"><a href="#match-mapping-type" class="headerlink" title="match_mapping_type"></a>match_mapping_type</h3><pre><code>PUT my-index-000001
+&#123;
+  &quot;mappings&quot;: &#123;
+    &quot;dynamic_templates&quot;: [
+      &#123;
+        &quot;integers&quot;: &#123;
+          &quot;match_mapping_type&quot;: &quot;long&quot;,
+          &quot;mapping&quot;: &#123;
+            &quot;type&quot;: &quot;integer&quot;
+          &#125;
+        &#125;
+      &#125;,
+      &#123;
+        &quot;strings&quot;: &#123;
+          &quot;match_mapping_type&quot;: &quot;string&quot;,
+          &quot;mapping&quot;: &#123;
+            &quot;type&quot;: &quot;text&quot;,
+            &quot;fields&quot;: &#123;
+              &quot;raw&quot;: &#123;
+                &quot;type&quot;:  &quot;keyword&quot;,
+                &quot;ignore_above&quot;: 256
+              &#125;
+            &#125;
+          &#125;
+        &#125;
+      &#125;
+    ]
+  &#125;
+&#125;
+
+PUT my-index-000001/_doc/1
+&#123;
+  &quot;my_integer&quot;: 5,   // 映射为integer类型
+  &quot;my_string&quot;: &quot;Some string&quot; // 映射为text类型，带有一个keyword子字段
+&#125;
+</code></pre>
+<h3 id="match-和-unmatch"><a href="#match-和-unmatch" class="headerlink" title="match 和 unmatch"></a>match 和 unmatch</h3><pre><code>PUT my-index-000001
+&#123;
+  &quot;mappings&quot;: &#123;
+    &quot;dynamic_templates&quot;: [
+      &#123;
+        &quot;longs_as_strings&quot;: &#123;
+          &quot;match_mapping_type&quot;: &quot;string&quot;,
+          &quot;match&quot;:   &quot;long_*&quot;,
+          &quot;unmatch&quot;: &quot;*_text&quot;,
+          &quot;mapping&quot;: &#123;
+            &quot;type&quot;: &quot;long&quot;
+          &#125;
+        &#125;
+      &#125;
+    ]
+  &#125;
+&#125;
+
+PUT my-index-000001/_doc/1
+&#123;
+  &quot;long_num&quot;: &quot;5&quot;,  // 映射为long类型
+  &quot;long_text&quot;: &quot;foo&quot;  // 使用默认映射类型string
+&#125;
+</code></pre>
+<h3 id="path-match-和-path-unmatch"><a href="#path-match-和-path-unmatch" class="headerlink" title="path_match 和 path_unmatch"></a>path_match 和 path_unmatch</h3><p>使用方法和 <code>match</code>、<code>unmatch</code>类似，可以对整个路径进行匹配。</p>
+<pre><code>PUT my-index-000001
+&#123;
+  &quot;mappings&quot;: &#123;
+    &quot;dynamic_templates&quot;: [
+      &#123;
+        &quot;full_name&quot;: &#123;
+          &quot;path_match&quot;:   &quot;name.*&quot;,
+          &quot;path_unmatch&quot;: &quot;*.middle&quot;,
+          &quot;mapping&quot;: &#123;
+            &quot;type&quot;:       &quot;text&quot;,
+            &quot;copy_to&quot;:    &quot;full_name&quot;
+          &#125;
+        &#125;
+      &#125;
+    ]
+  &#125;
+&#125;
+
+PUT my-index-000001/_doc/1
+&#123;
+  &quot;name&quot;: &#123;
+    &quot;first&quot;:  &quot;John&quot;,
+    &quot;middle&quot;: &quot;Winston&quot;,
+    &quot;last&quot;:   &quot;Lennon&quot;
+  &#125;
+&#125;
+</code></pre>
+<h3 id="模板变量：-name-和-dynamic-type"><a href="#模板变量：-name-和-dynamic-type" class="headerlink" title="模板变量：{name} 和 {dynamic_type}"></a>模板变量：{name} 和 {dynamic_type}</h3><ul>
+<li><code>&#123;name&#125;</code>: 字段名称</li>
+<li><code>&#123;dynamic_type&#125;</code>: 自动检测的字段类型</li>
+</ul>
+<pre><code>PUT my-index-000001
+&#123;
+  &quot;mappings&quot;: &#123;
+    &quot;dynamic_templates&quot;: [
+      &#123;
+        &quot;named_analyzers&quot;: &#123;
+          &quot;match_mapping_type&quot;: &quot;string&quot;,
+          &quot;match&quot;: &quot;*&quot;,
+          &quot;mapping&quot;: &#123;
+            &quot;type&quot;: &quot;text&quot;,
+            &quot;analyzer&quot;: &quot;&#123;name&#125;&quot;
+          &#125;
+        &#125;
+      &#125;,
+      &#123;
+        &quot;no_doc_values&quot;: &#123;
+          &quot;match_mapping_type&quot;:&quot;*&quot;,
+          &quot;mapping&quot;: &#123;
+            &quot;type&quot;: &quot;&#123;dynamic_type&#125;&quot;,
+            &quot;doc_values&quot;: false
+          &#125;
+        &#125;
+      &#125;
+    ]
+  &#125;
+&#125;
+
+PUT my-index-000001/_doc/1
+&#123;
+  &quot;english&quot;: &quot;Some English text&quot;, // 映射为text类型，并且使用english分析器
+  &quot;count&quot;:  5, // 映射为long类型 
+&#125;
+</code></pre>
+<h3 id="动态模板示例"><a href="#动态模板示例" class="headerlink" title="动态模板示例"></a>动态模板示例</h3><ol>
+<li>当设置 <code>&quot;dynamic&quot;:&quot;true&quot;</code> 时，Elasticsearch 会将字符串字段映射为带有关键字<code>keyword</code>子字段的文本字段。<br>如果只对结构化内容进行索引而不对全文搜索感兴趣，您可以让 Elasticsearch 将您的字段仅映射为关键字<code>keyword</code>字段。</li>
+</ol>
+<pre><code>PUT my-index-000001
+&#123;
+  &quot;mappings&quot;: &#123;
+    &quot;dynamic_templates&quot;: [
+      &#123;
+        &quot;strings_as_keywords&quot;: &#123;
+          &quot;match_mapping_type&quot;: &quot;string&quot;,
+          &quot;mapping&quot;: &#123;
+            &quot;type&quot;: &quot;keyword&quot;
+          &#125;
+        &#125;
+      &#125;
+    ]
+  &#125;
+&#125;
+</code></pre>
+<ol start="2">
+<li>与前面的示例相反，如果只关心字符串字段上的全文搜索并且不打算运行聚合、排序或精确搜索，告诉指示 Elasticsearch 将字符串映射为文本。</li>
+</ol>
+<pre><code>PUT my-index-000001
+&#123;
+  &quot;mappings&quot;: &#123;
+    &quot;dynamic_templates&quot;: [
+      &#123;
+        &quot;strings_as_text&quot;: &#123;
+          &quot;match_mapping_type&quot;: &quot;string&quot;,
+          &quot;mapping&quot;: &#123;
+            &quot;type&quot;: &quot;text&quot;
+          &#125;
+        &#125;
+      &#125;
+    ]
+  &#125;
+&#125;
+</code></pre>
+<ol start="3">
+<li>禁用规范(Norms): <code>规范(Norms)</code>是索引时间评分因素。如果不关心评分（例如从不按评分对文档进行排序就是这种情况），可以禁用这些评分因素在索引中的存储并节省一些空间。</li>
+</ol>
+<pre><code>PUT my-index-000001
+&#123;
+  &quot;mappings&quot;: &#123;
+    &quot;dynamic_templates&quot;: [
+      &#123;
+        &quot;strings_as_keywords&quot;: &#123;
+          &quot;match_mapping_type&quot;: &quot;string&quot;,
+          &quot;mapping&quot;: &#123;
+            &quot;type&quot;: &quot;text&quot;,
+            &quot;norms&quot;: false,
+            &quot;fields&quot;: &#123;
+              &quot;keyword&quot;: &#123;
+                &quot;type&quot;: &quot;keyword&quot;,
+                &quot;ignore_above&quot;: 256
+              &#125;
+            &#125;
+          &#125;
+        &#125;
+      &#125;
+    ]
+  &#125;
+&#125;
+</code></pre>
+<ol start="4">
+<li>时间序列(Time Series): 使用 Elasticsearch 进行时间序列分析时，通常会有许多数字字段，经常会根据这些字段进行聚合但从不进行过滤。在这种情况下，可以禁用对这些字段的索引以节省磁盘空间，并且还可以加快索引速度。</li>
+</ol>
+<pre><code>PUT my-index-000001
+&#123;
+  &quot;mappings&quot;: &#123;
+    &quot;dynamic_templates&quot;: [
+      &#123;
+        &quot;unindexed_longs&quot;: &#123;
+          &quot;match_mapping_type&quot;: &quot;long&quot;,
+          &quot;mapping&quot;: &#123;
+            &quot;type&quot;: &quot;long&quot;,
+            &quot;index&quot;: false
+          &#125;
+        &#125;
+      &#125;,
+      &#123;
+        &quot;unindexed_doubles&quot;: &#123;
+          &quot;match_mapping_type&quot;: &quot;double&quot;,
+          &quot;mapping&quot;: &#123;
+            &quot;type&quot;: &quot;float&quot;, 
+            &quot;index&quot;: false
+          &#125;
+        &#125;
+      &#125;
+    ]
+  &#125;
+&#125;
+</code></pre>
+<h1 id="显式映射"><a href="#显式映射" class="headerlink" title="显式映射"></a>显式映射</h1><p>通常使用 ES 时，我们自己对文档数据的了解会更详细，而不想去使用默认映射，这时候指定自己的显式映射。置顶显式映射的时机可以是：创建索引时和将字段添加到现有索引时。</p>
+<h2 id="创建索引时指定映射。"><a href="#创建索引时指定映射。" class="headerlink" title="创建索引时指定映射。"></a>创建索引时指定映射。</h2><pre><code>PUT /my-index-000001
+&#123;
+  &quot;mappings&quot;: &#123;
+    &quot;properties&quot;: &#123;
+      &quot;age&quot;:    &#123; &quot;type&quot;: &quot;integer&quot; &#125;,  
+      &quot;email&quot;:  &#123; &quot;type&quot;: &quot;keyword&quot;  &#125;, 
+      &quot;name&quot;:   &#123; &quot;type&quot;: &quot;text&quot;  &#125;     
+    &#125;
+  &#125;
+&#125;
+</code></pre>
+<h2 id="向已有映射中添加字段"><a href="#向已有映射中添加字段" class="headerlink" title="向已有映射中添加字段"></a>向已有映射中添加字段</h2><pre><code>PUT /my-index-000001/_mapping
+&#123;
+  &quot;properties&quot;: &#123;
+    &quot;employee-id&quot;: &#123;
+      &quot;type&quot;: &quot;keyword&quot;,
+      &quot;index&quot;: false
+    &#125;
+  &#125;
+&#125;
+</code></pre>
+<h2 id="查看一个索引的映射"><a href="#查看一个索引的映射" class="headerlink" title="查看一个索引的映射"></a>查看一个索引的映射</h2><pre><code>GET /my-index-000001/_mapping
+</code></pre>
+<h2 id="查看索引中某个字段的映射"><a href="#查看索引中某个字段的映射" class="headerlink" title="查看索引中某个字段的映射"></a>查看索引中某个字段的映射</h2><pre><code>GET /my-index-000001/_mapping/field/employee-id
+</code></pre>
 ]]></content>
       <categories>
-        <category>前端好文</category>
+        <category>ELK</category>
       </categories>
       <tags>
-        <tag>web前端</tag>
-        <tag>优秀文章</tag>
+        <tag>elk</tag>
+        <tag>elastic search</tag>
       </tags>
   </entry>
   <entry>
@@ -364,6 +702,51 @@ console.log(people); // [ Person &#123; name: &#39;john&#39; &#125;, Person &#12
       </tags>
   </entry>
   <entry>
+    <title>javascript中的垃圾回收</title>
+    <url>/2021/06/25/javascript/javascript%E4%B8%AD%E7%9A%84%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/</url>
+    <content><![CDATA[<p>在浏览器的发展史上，用到过两种主要的标记策略：标记清理和引用计数。</p>
+<!-- 这是注释：下面的标签表示文章只显示之前的内容作为摘要 -->
+<span id="more"></span>
+
+<h2 id="标记清理"><a href="#标记清理" class="headerlink" title="标记清理"></a>标记清理</h2><p>JavaScript 最常用的垃圾回收策略是标记清理（mark-and-sweep）。当变量进入上下文，比如在函数内部声明一个变量时，这个变量会被加上存在于上下文中的标记。而在上下文中的变量，逻辑上讲，永远不应该释放它们的内存，因为只要上下文中的代码在运行，就有可能用到它们。当变量离开上下文时，也会被加上离开上下文的标记。</p>
+<p>给变量加标记的方式有很多种。比如，当变量进入上下文时，反转某一位；或者可以维护“在上下文中”和“不在上下文中”两个变量列表，可以把变量从一个列表转移到另一个列表。标记过程的实现并不重要，关键是策略。<br>垃圾回收程序运行的时候，会标记内存中存储的所有变量（记住，标记方法有很多种）。然后，它会将所有在上下文中的变量，以及被在上下文中的变量引用的变量的标记去掉。在此之后再被加上标记的变量就是待删除的了，原因是任何在上下文中的变量都访问不到它们了。随后垃圾回收程序做一次内存清理，销毁带标记的所有值并收回它们的内存。</p>
+<p>到了 2008 年，IE、Firefox、Opera、Chrome 和 Safari 都在自己的 JavaScript 实现中采用标记清理（或其变体），只是在运行垃圾回收的频率上有所差异。</p>
+<h2 id="引用计数"><a href="#引用计数" class="headerlink" title="引用计数"></a>引用计数</h2><p>另一种没那么常用的垃圾回收策略是引用计数（reference counting）。其思路是对每个值都记录它被引用的次数。声明变量并给它赋一个引用值时，这个值的引用数为 1。<br>如果同一个值又被赋给另一个变量，那么引用数加 1。类似地，如果保存对该值引用的变量被其他值给覆盖了，那么引用数减 1。当一个值的引用数为 0 时，就说明没办法再访问到这个值了，因此可以安全地收回其内存了。<br>垃圾回收程序下次运行的时候就会释放引用数为 0 的值的内存。<br>引用计数最早由 Netscape Navigator 3.0 采用，但很快就遇到了严重的问题：循环引用。所谓循环引用，就是对象 A 有一个指针指向对象 B，而对象 B 也引用了对象 A。<br>为避免类似的循环引用问题，应该在确保不使用的情况下切断原生 JavaScript 对象与 DOM 元素之间的连接。</p>
+<p>比如，通过以下代码可以清除前面的例子中建立的循环引用：</p>
+<pre><code>myObject.element = null;￼
+element.someObject = null;
+</code></pre>
+<p>把变量设置为 null 实际上会切断变量与其之前引用值之间的关系。当下次垃圾回收程序运行时，这些值就会被删除，内存也会被回收。</p>
+<h2 id="内存泄漏"><a href="#内存泄漏" class="headerlink" title="内存泄漏"></a>内存泄漏</h2><p>写得不好的 JavaScript 可能出现难以察觉且有害的内存泄漏问题。在内存有限的设备上，或者在函数会被调用很多次的情况下，内存泄漏可能是个大问题。JavaScript 中的内存泄漏大部分是由不合理的引用导致的。</p>
+<ol>
+<li>意外声明全局变量是最常见但也最容易修复的内存泄漏问题。</li>
+<li>定时器也可能会悄悄地导致内存泄漏。下面的代码中，定时器的回调通过闭包引用了外部变量：</li>
+</ol>
+<pre><code>let name = &#39;Jake&#39;;￼
+setInterval(() =&gt; &#123;￼ console.log(name);￼ &#125;, 100);
+</code></pre>
+<p>只要定时器一直运行，回调函数中引用的 name 就会一直占用内存。</p>
+<ol start="3">
+<li>使用 JavaScript 闭包很容易在不知不觉间造成内存泄漏。请看下面的例子：</li>
+</ol>
+<pre><code>let outer = function() &#123;￼
+    let name = &#39;Jake&#39;;￼
+    return function() &#123;￼
+        return name;
+￼ &#125;;￼
+&#125;;
+</code></pre>
+<p>调用 outer()会导致分配给 name 的内存被泄漏。以上代码执行后创建了一个内部闭包，只要返回的函数存在就不能清理 name，因为闭包一直在引用着它。假如 name 的内容很大（不止是一个小字符串），那可能就是个大问题了。</p>
+]]></content>
+      <categories>
+        <category>web前端</category>
+      </categories>
+      <tags>
+        <tag>javascript</tag>
+        <tag>垃圾回收</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>javascript面向对象</title>
     <url>/2021/06/27/javascript/javascript%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/</url>
     <content><![CDATA[<p>本文介绍了 javascript 中创建对象的方法以及实现继承的方法。</p>
@@ -528,6 +911,86 @@ new Van(); // Error: Inheriting class must define foo()
         <tag>javascript</tag>
         <tag>面向对象</tag>
         <tag>原型继承</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>前端好文</title>
+    <url>/2021/06/29/web%E5%89%8D%E7%AB%AF/%E5%89%8D%E7%AB%AF%E5%A5%BD%E6%96%87/</url>
+    <content><![CDATA[<p>日常收集的关于前端开发的优秀文章，多读多消化。</p>
+<!-- 这是注释：下面的标签表示文章只显示之前的内容作为摘要 -->
+<span id="more"></span>
+
+<ul>
+<li><p><a href="https://developer.mozilla.org/zh-CN/docs/Web/API">web API 接口参考</a></p>
+</li>
+<li><p><a href="https://developer.mozilla.org/zh-CN/docs/Web/Events">web 事件参考</a></p>
+</li>
+<li><p><a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference">javascript 参考 MDN</a></p>
+</li>
+<li><p><a href="https://iwiki.woa.com/pages/viewpage.action?pageId=375828171">前端监控实现原理</a></p>
+</li>
+<li><p><a href="http://km.oa.com/group/sitepoint/articles/show/364557">前端监控实现思路</a></p>
+</li>
+<li><p><a href="http://km.oa.com/group/32560/articles/show/365524">emonitor 前端监控实现</a></p>
+</li>
+<li><p><a href="https://www.wxapp-union.com/article-6184-1.html">小程序监控</a></p>
+</li>
+<li><p><a href="https://juejin.cn/post/6844903617292402702">小程序异常监控收集</a></p>
+</li>
+<li><p><a href="http://www.ruanyifeng.com/blog/2013/01/javascript_source_map.html">JavaScript Source Map 详解</a></p>
+</li>
+<li><p><a href="https://mp.weixin.qq.com/s/1TQwNx0Q69qEBcoXwJ-Vpg">来看看字节是如何做前端异常监控的，source 简介</a></p>
+</li>
+<li><p><a href="https://mp.weixin.qq.com/s/rJ0yMBcDvm9KD0OF2gLfAA">从微服务到微前端：浅谈微前端的设计思想</a></p>
+</li>
+<li><p><a href="https://overreacted.io/zh-hans/a-complete-guide-to-useeffect/">useEffect 完整指南</a></p>
+</li>
+<li><p><a href="https://mp.weixin.qq.com/s/JURLrg4VCBDCN3vttV4ahQ">react hooks 原理</a></p>
+</li>
+<li><p>精读《React Hooks》</p>
+</li>
+<li><p>精读《怎么用 React Hooks 造轮子》</p>
+</li>
+<li><p>精读《useEffect 完全指南》</p>
+</li>
+<li><p>精读《Function VS Class 组件》</p>
+</li>
+<li><p><a href="https://mp.weixin.qq.com/s/-dVGGoVA8kpv9PaSNMoMSg">React 性能优化完全指南</a></p>
+</li>
+<li><p><a href="https://mp.weixin.qq.com/s/UPy5Qwesz8ia3XpjrUJ4oQ">深入理解 React Router：Context、Hooks、Refs、Memo 特性讲解</a></p>
+</li>
+<li><p><a href="https://github.com/linqinghao/blog/issues/18">Typescript 中的装饰器与元数据反射</a></p>
+</li>
+<li><p><a href="https://mp.weixin.qq.com/s/PFgc8xD7gT40-9qXNTpk7A">Typescript 装饰器详解</a></p>
+</li>
+<li><p><a href="https://segmentfault.com/a/1190000021508564">使用 typescript 装饰器构建 nodejs 路由</a></p>
+</li>
+<li><p><a href="https://zhuanlan.zhihu.com/p/215385588">使用 typescript 装饰器构建 nodejs 路由</a></p>
+</li>
+<li><p><a href="https://mp.weixin.qq.com/s/QcVA6yEw3NvDV1ZLtoMcug">手写一个脚手架</a></p>
+</li>
+<li><p><a href="https://segmentfault.com/a/1190000020335010?utm_source=sf-similar-article">手把手教你搭建脚手架工具</a></p>
+</li>
+<li><p><a href="http://www.semlinker.com/categories/node-js/">深入学习 nodejs 系列</a></p>
+</li>
+<li><p><a href="https://yjhjstz.gitbooks.io/deep-into-node/content/">deep-into-node</a></p>
+</li>
+<li><p><a href="https://jishuin.proginn.com/p/763bfbd57afc">虚拟列表实现原理</a></p>
+</li>
+<li><p><a href="https://jishuin.proginn.com/u/548404">这个用户下有些文章质量挺高</a></p>
+</li>
+<li><p><a href="https://jishuin.proginn.com/p/763bfbd4cedb">学会 Proxy 真的可以为所欲为</a></p>
+</li>
+<li><p><a href="https://mp.weixin.qq.com/s/Etied9JkAB2jZUMvD4LWIA">腾讯课堂小程序性能极致优化</a></p>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>前端好文</category>
+      </categories>
+      <tags>
+        <tag>web前端</tag>
+        <tag>优秀文章</tag>
       </tags>
   </entry>
   <entry>
@@ -952,81 +1415,6 @@ acknowledgement.
       </categories>
       <tags>
         <tag>计算机网络</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>elasticeSearch简介</title>
-    <url>/2021/08/24/elasticSearch/elasticSearch%E7%AE%80%E4%BB%8B/</url>
-    <content><![CDATA[<p>Elastic Search 简介。</p>
-<!-- 这是注释：下面的标签表示文章只显示之前的内容作为摘要 -->
-<span id="more"></span>
-
-<h1 id="Elastic-Search-应用场景"><a href="#Elastic-Search-应用场景" class="headerlink" title="Elastic Search 应用场景"></a>Elastic Search 应用场景</h1><p>ES是一个分布式文档存储引擎，支持近乎实时(NRT, Near-RealTime)的搜索功能。主要应用场景如下：</p>
-<ol>
-<li>实现网站或App的搜索功能</li>
-<li>作为存储引擎和数据分析</li>
-<li>机器学习领域实时数据建模</li>
-<li>管理、集成、分析空间信息数据(GIS)</li>
-<li>生物信息领域存储和处理遗传信息</li>
-<li>其他场景…</li>
-</ol>
-<h1 id="Elastic-Search-基础术语"><a href="#Elastic-Search-基础术语" class="headerlink" title="Elastic Search 基础术语"></a>Elastic Search 基础术语</h1><ul>
-<li>索引(index): 类似于关系数据库中的 database，是一组文档的集合</li>
-<li>文档(document): 键值对的集合，可以理解为 JSON 对象</li>
-</ul>
-<p>ES内部高效存储着文档的数据，文本数据以<code>倒排索引(inverted indices)</code>的形式存储，数值、地理信息等数据则存储在<code>BKD Tree</code>这种数据结构中，所以ES查询速度很快。</p>
-<h1 id="Schema-less"><a href="#Schema-less" class="headerlink" title="Schema-less"></a>Schema-less</h1><p>ES 无需提前定义文档的格式(Schema), 可以存储包含任意字段的文档数据， ES会自动判断所有键对应值的格式并妥善存储。但是，实际使用中建议还是提前定义数据格式(Mapping)。<br>提前定义Mapping有如下好处：</p>
-<ul>
-<li>可以区分全文索引字段和精确值字段</li>
-<li>可以执行特定于语言的文本分析</li>
-<li>可以优化部分匹配的字段</li>
-<li>可以使用自定义的日期格式</li>
-<li>可以使用<code>geo_point</code>和<code>geo_shape</code>数据类型，这些数据类型不能被 ES 自动识别</li>
-</ul>
-<h1 id="可以为同一个字段建立不同的索引方式"><a href="#可以为同一个字段建立不同的索引方式" class="headerlink" title="可以为同一个字段建立不同的索引方式"></a>可以为同一个字段建立不同的索引方式</h1><p>例如，可以将字符串同时索引为文本字段(text filed) 和关键字(keyword)字段。前者利于全文检索，后者则可以用于排序和聚合。</p>
-<p>同时，也可以选择使用多个语言分析器来处理包含用户输入的字符串字段的内容。</p>
-<h1 id="数据查询"><a href="#数据查询" class="headerlink" title="数据查询"></a>数据查询</h1><p>ES 基于 Apache Lucene 搜索引擎，提供了一套便于使用、功能强大的 REST API，并且提供了常用编程语言的 SDK。这套 REST API 支持的查询有：</p>
-<ul>
-<li>结构化查询(structured queries): 类似于在 SQL 中构造的查询类型</li>
-<li>全文索引查询(full text queries): 查询字符串匹配的所有文档并按<code>相关性(relevance)</code>排序返回它们</li>
-<li>复合查询(complex queries): 综合前两者</li>
-</ul>
-<p>除了搜索单个术语(term)外，ES 还支持如下查询：</p>
-<ul>
-<li>短语搜索</li>
-<li>相似性搜索</li>
-<li>前缀搜索</li>
-<li>自动补全搜索</li>
-</ul>
-<p>可以使用 Elasticsearch 的综合 JSON 样式查询语言 (Query DSL) 访问所有这些搜索功能。</p>
-<h1 id="数据分析"><a href="#数据分析" class="headerlink" title="数据分析"></a>数据分析</h1><p>Elasticsearch 聚合(aggregations)功能能够构建复杂的数据摘要并深入了解关键指标(metrics)、模式(patterns)和趋势(trends)。</p>
-<p>例如： 除了常见的<code>从草堆里捞针</code>这种查询，ES还能回答下列问题：</p>
-<ol>
-<li>总共有多少根针？</li>
-<li>这些针的平均长度是多少？</li>
-<li>不同制造商制造的针的长度中位数是多少？</li>
-<li>最受欢迎的针头制造商是哪家？</li>
-</ol>
-<p>更重要的是，聚合与搜索请求一起运行。可以在单个请求中对相同数据同时搜索文档、过滤结果和执行分析。</p>
-<h1 id="可扩展性和弹性：集群-cluster-、节点-node-、分片-shard"><a href="#可扩展性和弹性：集群-cluster-、节点-node-、分片-shard" class="headerlink" title="可扩展性和弹性：集群(cluster)、节点(node)、分片(shard)"></a>可扩展性和弹性：集群(cluster)、节点(node)、分片(shard)</h1><p>ES 是一个分布式的存储系统，可以很容易进行弹性伸缩。将新节点加入集群后，集群会自动进行负载均衡，将数据分布到不同的节点。</p>
-<p>如何做到的？</p>
-<p>一个索引是包含一个或多个物理分片的逻辑分组，其中每个分片实际上是一个独立的索引。通过将索引中的文档分布在多个分片中，并将这些分片分布在多个节点上，Elasticsearch 可以确保冗余，这既可以防止硬件故障，又可以在将节点添加到集群时增加查询容量。<br>随着集群的增长（或缩小），Elasticsearch 会自动迁移分片以重新平衡集群。</p>
-<p>分片有两种类型：主分片(primaries)和副本(replicas)。索引中的每个文档都属于一个主分片。副本分片是主分片的副本。副本提供数据的冗余副本，以防止硬件故障并增加处理读取请求（如搜索或检索文档）的容量。</p>
-<h1 id="分片数量"><a href="#分片数量" class="headerlink" title="分片数量"></a>分片数量</h1><p>索引中的主分片数量在创建索引时是固定的，但副本分片的数量可以随时更改，而不会中断索引或查询操作。</p>
-<p>关于分片大小和为索引配置的主分片数量，有许多性能考虑和权衡。分片越多，维护这些索引的开销就越大。分片大小越大，当 Elasticsearch 需要重新平衡集群时，移动分片所需的时间就越长。<br>查询大量小分片会使每个分片的处理速度更快，但更多查询意味着更多开销，因此查询较少数量的较大分片可能会更快。简而言之……视情况而定。</p>
-<ul>
-<li>将平均分片大小保持在几 GB 到几十 GB 之间。对于具有基于时间的数据的用例，通常会看到 20GB 到 40GB 范围内的分片。</li>
-<li>避免大量碎片问题。一个节点可以容纳的分片数量与可用的堆空间成正比。作为一般规则，每 GB 堆空间的分片数应小于 20。</li>
-</ul>
-<h1 id="避免灾难"><a href="#避免灾难" class="headerlink" title="避免灾难"></a>避免灾难</h1><p>Avoid putting all of your eggs in one basket（不要把鸡蛋放在同一个篮子里）。</p>
-<p>跨集群备份： Cross-cluster replication (CCR)</p>
-]]></content>
-      <categories>
-        <category>ELK</category>
-      </categories>
-      <tags>
-        <tag>elk</tag>
-        <tag>elastic search</tag>
       </tags>
   </entry>
 </search>
